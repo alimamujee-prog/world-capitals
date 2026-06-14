@@ -143,16 +143,20 @@
 
   .fhero-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
     text-align:center;width:92%;max-width:600px;pointer-events:none}
-  .fhero-center h1{font-size:clamp(46px,8.5vw,88px);font-weight:800;letter-spacing:-.035em;line-height:1;color:var(--ink)}
+  .fhero-center::before{content:"";position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);z-index:-1;
+    width:min(760px,94vw);height:540px;border-radius:50%;filter:blur(4px);
+    background:radial-gradient(closest-side, rgba(247,249,252,.97), rgba(247,249,252,.82) 50%, transparent 80%)}
+  .fhero-center h1{font-size:clamp(44px,7.6vw,78px);font-weight:800;letter-spacing:-.035em;line-height:1;color:var(--ink)}
   .fhero-center .hl{color:var(--accent)}
   .fhero-sub{color:var(--soft);font-size:clamp(15px,2.2vw,18px);margin-top:20px;font-weight:500}
-  .fhero-ded{position:relative;margin:18px auto 0;max-width:430px;padding-top:18px;
-    font-size:14px;font-style:italic;font-weight:500;line-height:1.55;color:var(--ink-2)}
+  .fhero-ded{position:relative;margin:14px auto 0;max-width:380px;padding-top:14px;
+    font-size:12.5px;font-style:italic;font-weight:500;line-height:1.5;color:var(--soft)}
   .fhero-ded::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
     width:42px;height:2px;border-radius:2px;background:var(--accent)}
   .fhero-center .btn{margin-top:26px;pointer-events:auto}
-  .fhero-cue{margin-top:22px;font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
-  .fhero-cue span{display:inline-block;animation:bob 2s ease-in-out infinite}
+  .fhero-cue{margin-top:20px;display:inline-flex;flex-direction:column;align-items:center;gap:3px;
+    font-size:11.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+  .fhero-cue .chev{color:var(--accent);animation:bob 1.7s ease-in-out infinite}
   @keyframes bob{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(5px);opacity:1}}
 
   .fhero-arc{position:absolute;left:50%;top:7%;transform:translateX(-50%);z-index:2;
@@ -160,6 +164,13 @@
   .fhero-arc h2{font-size:clamp(26px,4.6vw,46px);font-weight:800;letter-spacing:-.03em;color:var(--ink)}
   .fhero-arc .hl{color:var(--accent)}
   .fhero-arc p{color:var(--soft);margin-top:12px;font-size:clamp(14px,1.8vw,16px);max-width:480px;margin-left:auto;margin-right:auto}
+  .fhero-nav{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:18px 22px;pointer-events:none}
+  .fnav-brand,.fnav-cta{pointer-events:auto;text-decoration:none;transition:.16s}
+  .fnav-brand{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:16px;color:var(--ink);letter-spacing:-.01em}
+  .fnav-brand svg{color:var(--accent)}
+  .fnav-cta{font-weight:700;font-size:13.5px;color:var(--accent);background:#fff;border:1px solid #E2E8F0;padding:9px 17px;border-radius:999px;box-shadow:0 4px 12px -6px rgba(15,23,42,.2)}
+  .fnav-cta:hover{border-color:var(--accent);transform:translateY(-1px)}
+  @media (max-width:560px){.fnav-brand{font-size:14px}.fnav-cta{font-size:12.5px;padding:8px 14px}}
 
   @media (max-width:600px){
     .fcard{width:50px;height:70px}
@@ -439,16 +450,22 @@
 <section class="fhero" id="fhero">
   <div class="fhero-sticky" id="fheroSticky">
     <div class="fhero-grid"></div>
+
+    <div class="fhero-nav">
+      <a class="fnav-brand" href="#" aria-label="World Capitals home"><svg width="21" height="21" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><ellipse cx="12" cy="12" rx="4" ry="9" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18" stroke="currentColor" stroke-width="1.8"/></svg>World Capitals</a>
+      <a class="fnav-cta" href="#tool">Practice &rarr;</a>
+    </div>
+
     <div class="fcards" id="fcards"></div>
 
     <div class="fhero-center" id="fheroCenter">
       <h1>World <span class="hl">Capitals</span></h1>
-      <p class="fhero-sub">Every UN recognized world capital, in orbit.</p>
+      <p class="fhero-sub">Browse all 195, flip flashcards, and race the clock in quiz mode.</p>
       <p class="fhero-ded">To my Khatri family, the most beautiful, generous, and loving people in the world.</p>
       <a href="#tool" class="btn btn-primary" id="startBtn">Start practicing
         <svg class="ico" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-      <div class="fhero-cue"><span>Scroll to explore &darr;</span></div>
+      <div class="fhero-cue"><span>Scroll to explore</span><svg class="chev" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
 
     <div class="fhero-arc" id="fheroArc">
@@ -1180,7 +1197,7 @@ render();
     }
     const isMobile=W<768;
     const minD=Math.min(W,H);
-    const cR=Math.min(minD*0.34,330);
+    const cR=Math.min(minD*0.40,400);
     const cA=(i/N)*360, cRad=cA*Math.PI/180;
     const circle={x:Math.cos(cRad)*cR,y:Math.sin(cRad)*cR,rot:cA+90};
     const baseR=Math.min(W,H*1.5);
