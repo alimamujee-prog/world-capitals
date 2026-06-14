@@ -420,6 +420,7 @@
     .qdaily:hover{transform:translateY(-2px)}
     .qchal:hover{transform:translateY(-2px)}
     .qr-chal:hover{background:#FFEDD5;border-color:#D97706}
+    .qr-lb-submit:hover{background:var(--accent-deep)}
   }
   .qchal{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;font:inherit;cursor:pointer;background:linear-gradient(135deg,#B45309,#D97706);color:#fff;border:none;border-radius:14px;padding:15px 18px;margin-bottom:11px;box-shadow:var(--shadow)}
   .qchal-l b{display:block;font-size:15px;font-weight:800}
@@ -433,6 +434,24 @@
   .qr-h2h-row.me{background:var(--accent-soft);color:var(--accent);font-weight:800;border-bottom:1px solid var(--line)}
   .qr-h2h-row b{font-weight:800}
   .qr-h2h-result{text-align:center;padding:12px;font-size:15px;font-weight:800;color:var(--good);background:var(--good-soft);border-top:1px solid var(--line)}
+  .qr-lb{margin-top:14px;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--shadow-sm);overflow:hidden;text-align:left}
+  .qr-lb-head{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--ink);padding:13px 16px;border-bottom:1px solid var(--line);background:var(--bg-soft)}
+  .qr-lb-body{padding:14px 16px}
+  .qr-lb-form{display:flex;gap:8px}
+  .qr-lb-name{flex:1;min-width:0;font:inherit;font-size:14px;padding:11px 13px;border:1px solid var(--line-2);border-radius:10px;color:var(--ink);background:var(--card)}
+  .qr-lb-name:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.14)}
+  .qr-lb-submit{font:inherit;font-weight:700;font-size:14px;cursor:pointer;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:11px 16px;white-space:nowrap}
+  .qr-lb-submit:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .qr-lb-hint{font-size:12px;color:var(--faint);font-weight:500;margin-top:9px;text-align:center}
+  .qr-lb-pct{font-size:14px;font-weight:600;color:var(--ink-2);text-align:center;margin-bottom:11px}
+  .qr-lb-pct b{color:var(--accent);font-weight:800}
+  .qr-lb-list{display:flex;flex-direction:column;gap:2px}
+  .qr-lb-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;font-size:14px}
+  .qr-lb-row.me{background:var(--accent-soft)}
+  .qr-lb-row.me .qr-lb-nm{color:var(--accent);font-weight:800}
+  .qr-lb-rank{width:22px;font-weight:800;color:var(--faint);text-align:center;flex:none}
+  .qr-lb-nm{flex:1;font-weight:600;color:var(--ink);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .qr-lb-sc{font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -1072,6 +1091,32 @@ function qShare(grade,rating,dl,n){
   };
   if(document.fonts&&document.fonts.ready){document.fonts.ready.then(go).catch(go);}else go();
 }
+
+/* ---- leaderboard (Supabase REST, anon key + RLS) ---- */
+const SB_URL='https://vklrlixklqrxoykvznlj.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrbHJsaXhrbHFyeG95a3Z6bmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NTA4MjMsImV4cCI6MjA5NzAyNjgyM30.9PCJU-EhhpgVpSkcuHodGRKxdt-FFRFZVQz9ypXEDFM';
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function sbH(extra){const o={apikey:SB_KEY,Authorization:'Bearer '+SB_KEY};if(extra)for(const k in extra)o[k]=extra[k];return o;}
+function lbSubmit(rec){return fetch(SB_URL+'/rest/v1/scores',{method:'POST',headers:sbH({'Content-Type':'application/json','Prefer':'return=minimal'}),body:JSON.stringify(rec)});}
+function lbTop(limit){return fetch(SB_URL+'/rest/v1/scores?select=name,score&order=score.desc&limit='+limit,{headers:sbH()}).then(function(r){return r.ok?r.json():[];});}
+function lbCount(q){return fetch(SB_URL+'/rest/v1/scores?select=id'+(q||''),{headers:sbH({'Prefer':'count=exact','Range':'0-0'})}).then(function(r){const cr=r.headers.get('content-range')||'/0';return parseInt(cr.split('/')[1],10)||0;});}
+function lbPercentile(score){return Promise.all([lbCount(''),lbCount('&score=lt.'+score)]).then(function(a){const total=a[0],below=a[1];return {total:total,below:below,pct:total>1?Math.round(below/(total-1)*100):null};});}
+function lbRender(body,top,pct,name){
+  const pctLine=pct.total<=1?'You are first on the board! &#127757;':(pct.pct!=null?'You beat <b>'+pct.pct+'%</b> of players &middot; rank #'+Math.max(1,pct.total-pct.below)+' of '+pct.total:'');
+  const rows=top.map(function(r,i){return '<div class="qr-lb-row'+(r.name===name?' me':'')+'"><span class="qr-lb-rank">'+(i+1)+'</span><span class="qr-lb-nm">'+esc(r.name)+'</span><span class="qr-lb-sc">'+Number(r.score).toLocaleString()+'</span></div>';}).join('');
+  body.innerHTML='<div class="qr-lb-pct">'+pctLine+'</div><div class="qr-lb-list">'+rows+'</div>';
+}
+function lbDoSubmit(rating){
+  const nameI=document.getElementById('qrlbname'),body=document.getElementById('qrlbbody');
+  if(!nameI||!body)return;
+  const name=((nameI.value||'').trim().slice(0,16))||'Anonymous';
+  localStorage.setItem('wc_name',name);
+  body.innerHTML='<div class="qr-lb-hint">Submitting&hellip;</div>';
+  lbSubmit({name:name,score:qScore,rating:rating,correct:qCorrect,questions:qList.length,difficulty:qDaily?'daily':qCfg.diff,mode:qDaily?'mixed':qCfg.mode})
+    .then(function(){return Promise.all([lbTop(10),lbPercentile(qScore)]);})
+    .then(function(a){lbRender(body,a[0],a[1],name);})
+    .catch(function(){body.innerHTML='<div class="qr-lb-hint">Could not reach the leaderboard. Try again later.</div>';});
+}
 function renderQuizDone(){
   qClearTimer();
   const n=qList.length,acc=n?Math.round(qCorrect/n*100):0,tot=qTotalMs/1000,avg=n?tot/n:0;
@@ -1114,6 +1159,13 @@ function renderQuizDone(){
         <button class="qr-alt" id="qshare"><svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg> Share result</button>
       </div>
       <button class="qr-chal" id="qchalshare">&#127919; Challenge a friend</button>
+      ${SB_KEY?`<div class="qr-lb" id="qrlb">
+        <div class="qr-lb-head">&#127942; Global Leaderboard</div>
+        <div class="qr-lb-body" id="qrlbbody">
+          <div class="qr-lb-form"><input id="qrlbname" class="qr-lb-name" maxlength="16" placeholder="Your name" value="${esc(localStorage.getItem('wc_name')||'')}"><button class="qr-lb-submit" id="qrlbsubmit">Add my score</button></div>
+          <div class="qr-lb-hint">See where your ${qScore.toLocaleString()} pts ranks worldwide.</div>
+        </div>
+      </div>`:''}
       <button class="qr-link" id="qchange">Change settings</button>
       ${qMissed.length?`<div class="qreview"><div class="qrev-h">Correct answers (the ${qMissed.length} you missed)</div>${qMissed.map(m=>`<div class="qrev-item"><span class="qrev-c">${m.item.f} ${m.item.c}</span><span class="qrev-a">${m.item.cap}</span></div>`).join('')}</div>`:`<div class="qreview perfect">Flawless run. Not a single miss.</div>`}
     </div>`;
@@ -1121,6 +1173,7 @@ function renderQuizDone(){
   $('#qchange').addEventListener('click',()=>{qPhase='setup';render();});
   $('#qshare').addEventListener('click',()=>qShare(grade,rating,dl,n));
   $('#qchalshare').addEventListener('click',()=>qChallengeShare(rating));
+  const lbb=document.getElementById('qrlbsubmit');if(lbb)lbb.addEventListener('click',()=>lbDoSubmit(rating));
   document.getElementById('tool').scrollIntoView();
 }
 
