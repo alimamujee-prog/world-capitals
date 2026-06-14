@@ -274,9 +274,19 @@
 
   /* result */
   .qresult{max-width:560px;margin:0 auto;text-align:center;background:linear-gradient(150deg,#FFFFFF,#F8FAFC 55%,#F1F5F9);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:38px 26px 28px}
-  .qr-rank{font-size:14px;font-weight:800;letter-spacing:.03em;color:var(--accent);text-transform:uppercase}
-  .qr-score{font-size:clamp(52px,15vw,84px);font-weight:800;line-height:1;letter-spacing:-.04em;color:var(--ink);margin:6px 0 2px}
-  .qr-score span{font-size:20px;font-weight:700;color:var(--faint);letter-spacing:0;margin-left:6px}
+.qr-rank{font-size:14px;font-weight:800;letter-spacing:.03em;color:var(--accent);text-transform:uppercase}
+  .qr-badges{display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
+  .qr-diff,.qr-mode{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:6px 13px;border-radius:999px}
+  .qr-diff.easy{color:var(--good);background:var(--good-soft);border:1px solid rgba(22,163,74,.25)}
+  .qr-diff.medium{color:var(--accent);background:var(--accent-soft);border:1px solid rgba(37,99,235,.22)}
+  .qr-diff.hard{color:var(--gold-deep);background:var(--gold-soft);border:1px solid rgba(184,134,11,.32)}
+  .qr-mode{color:var(--soft);background:var(--bg-soft);border:1px solid var(--line-2)}
+  .qr-grade{font-size:clamp(66px,18vw,108px);font-weight:800;line-height:.9;letter-spacing:-.04em}
+  .qr-grade.gA{color:var(--good)} .qr-grade.gB{color:var(--accent)} .qr-grade.gC{color:#CA8A04} .qr-grade.gD{color:#EA580C} .qr-grade.gF{color:var(--bad)}
+  .qr-rating{margin-top:6px;font-size:14px;font-weight:700;color:var(--ink-2)}
+  .qr-rating span{color:var(--faint);font-weight:600}
+  .qr-score{font-size:23px;font-weight:800;letter-spacing:-.02em;color:var(--ink);margin:14px 0 2px}
+  .qr-score span{font-size:13px;font-weight:600;color:var(--faint);margin-left:5px}
   .qr-sub{color:var(--soft);font-size:13.5px;font-weight:600;margin-bottom:24px}
   .qr-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
   .qr-stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 8px;box-shadow:var(--shadow-sm)}
@@ -775,7 +785,7 @@ function qdiff(d){return EASY.has(d.c)?'easy':HARD.has(d.c)?'hard':'medium';}
 
 let qPhase='setup';
 let qCfg={count:10,diff:'medium',mode:'capital',region:'All'};
-let qList=[],qIdx=0,qScore=0,qStreak=0,qBestStreak=0,qCorrect=0,qMissed=[];
+let qList=[],qIdx=0,qScore=0,qStreak=0,qBestStreak=0,qCorrect=0,qSpeedSum=0,qMissed=[];
 let qAnswered=false,qTimer=null,qStart=0,qTotalMs=0;
 
 function qClearTimer(){if(qTimer){clearInterval(qTimer);qTimer=null;}}
@@ -802,10 +812,16 @@ function qBuild(){
     const answer=kind==='cap'?item.cap:item.c;
     return {item,kind,answer,opts:shuffle([answer,...qDistract(item,kind)])};
   });
-  qIdx=0;qScore=0;qStreak=0;qBestStreak=0;qCorrect=0;qMissed=[];qTotalMs=0;
+  qIdx=0;qScore=0;qStreak=0;qBestStreak=0;qCorrect=0;qSpeedSum=0;qMissed=[];qTotalMs=0;
 }
 function fmtTime(s){s=Math.floor(s);const m=Math.floor(s/60),r=s%60;return m+':'+(r<10?'0':'')+r;}
 
+function qMaxScore(n){let s=0;for(let i=1;i<=n;i++)s+=1000*Math.min(1+0.2*(i-1),2);return s;}
+function qRating(score,n){const m=qMaxScore(n);return n?Math.max(0,Math.min(100,Math.round(score/m*100))):0;}
+function qGrade(r){const t=[[97,"A+"],[93,"A"],[90,"A-"],[87,"B+"],[83,"B"],[80,"B-"],[77,"C+"],[73,"C"],[70,"C-"],[67,"D+"],[63,"D"],[60,"D-"]];for(const x of t)if(r>=x[0])return x[1];return"F";}
+function qGradeCls(r){return r>=90?"gA":r>=80?"gB":r>=70?"gC":r>=60?"gD":"gF";}
+function qDiffLabel(k){const o=QDIFFS.find(x=>x.k===k);return o?o.label:k;}
+function qModeLabel(k){const o=QMODES.find(x=>x.k===k);return o?o.label:k;}
 function renderQuizTab(){
   if(qPhase==='play')renderQuizPlay();
   else if(qPhase==='done')renderQuizDone();
@@ -816,7 +832,7 @@ function renderQuizSetup(){
   qClearTimer();
   const avail=qPool().length;
   const eff=Math.min(qCfg.count,avail);
-  const best=parseInt(localStorage.getItem('wc_quiz_best')||'0',10);
+  const bestR=parseInt(localStorage.getItem('wc_grade_'+qCfg.diff)||'0',10);
   const counts=QSET_COUNTS.map(c=>`<button class="qpill${qCfg.count===c?' on':''}" data-set="count" data-val="${c}"${(c>avail&&avail>0)?' disabled':''}>${c}</button>`).join('');
   const diffs=QDIFFS.map(o=>`<button class="qpill col${qCfg.diff===o.k?' on':''}" data-set="diff" data-val="${o.k}"><span>${o.label}</span><small>${o.desc}</small></button>`).join('');
   const modes=QMODES.map(o=>`<button class="qpill col${qCfg.mode===o.k?' on':''}" data-set="mode" data-val="${o.k}"><span>${o.label}</span><small>${o.desc}</small></button>`).join('');
@@ -828,7 +844,7 @@ function renderQuizSetup(){
       <div class="qgroup"><div class="qglabel">Difficulty</div><div class="qrow">${diffs}</div></div>
       <div class="qgroup"><div class="qglabel">You name the&hellip;</div><div class="qrow">${modes}</div></div>
       <div class="qgroup"><div class="qglabel">Region</div><select id="qregion" class="qregion" aria-label="Quiz region">${regions}</select></div>
-      ${best?`<div class="qbest">Personal best <b>${best.toLocaleString()}</b></div>`:''}
+      ${bestR?`<div class="qbest">Your best on ${qDiffLabel(qCfg.diff)}: <b>${qGrade(bestR)}</b> &middot; ${bestR}/100</div>`:''}
       <button class="qstart" id="qstart"${avail<1?' disabled':''}>${avail<1?'No capitals match &mdash; widen your filters':'Start quiz &middot; '+eff+' question'+(eff===1?'':'s')}<svg class="ico" width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>`;
   app.querySelectorAll('.qpill').forEach(b=>{if(b.disabled)return;b.addEventListener('click',()=>{const s=b.dataset.set;qCfg[s]=s==='count'?+b.dataset.val:b.dataset.val;render();});});
@@ -881,6 +897,7 @@ function qAnswer(btn,q,bs,timeout){
   if(correct){
     qCorrect++;qStreak++;if(qStreak>qBestStreak)qBestStreak=qStreak;
     const speed=Math.max(0,(Q_TIME-respMs/1000)/Q_TIME);
+    qSpeedSum+=speed;
     const mult=Math.min(1+0.2*(qStreak-1),2);
     gained=Math.round((500+500*speed)*mult);
     qScore+=gained;
@@ -905,13 +922,22 @@ function qRank(acc){
 function renderQuizDone(){
   qClearTimer();
   const n=qList.length,acc=n?Math.round(qCorrect/n*100):0,tot=qTotalMs/1000,avg=n?tot/n:0;
-  const best=parseInt(localStorage.getItem('wc_quiz_best')||'0',10);
-  const isNew=qScore>best;if(isNew)localStorage.setItem('wc_quiz_best',String(qScore));
+  const speedScore=qCorrect?qSpeedSum/qCorrect:0;const rating=n?Math.max(0,Math.min(100,Math.round(qCorrect/n*90+speedScore*10))):0;const grade=qGrade(rating),gcls=qGradeCls(rating);
+  const dl=qDiffLabel(qCfg.diff);
+  const key='wc_grade_'+qCfg.diff;
+  const prev=parseInt(localStorage.getItem(key)||'0',10);
+  const isNew=rating>prev;if(isNew)localStorage.setItem(key,String(rating));
+  const bestLine=isNew?'&#9733; New best on '+dl+'!':(prev>0?'Your best on '+dl+': '+qGrade(prev)+' &middot; '+prev+'/100':'&nbsp;');
   app.innerHTML=`
     <div class="qresult">
-      <div class="qr-rank">${qRank(acc)}</div>
+      <div class="qr-badges">
+        <span class="qr-diff ${qCfg.diff}">${dl}</span>
+        <span class="qr-mode">${qModeLabel(qCfg.mode)} mode</span>
+      </div>
+      <div class="qr-grade ${gcls}">${grade}</div>
+      <div class="qr-rating">${rating}<span>/100</span> &middot; ${qRank(acc)}</div>
       <div class="qr-score">${qScore.toLocaleString()}<span>pts</span></div>
-      <div class="qr-sub">${isNew?'&#9733; New personal best!':'Personal best '+best.toLocaleString()}</div>
+      <div class="qr-sub">${bestLine}</div>
       <div class="qr-stats">
         <div class="qr-stat"><div class="n">${qCorrect}/${n}</div><div class="l">Correct &middot; ${acc}%</div></div>
         <div class="qr-stat"><div class="n">${qBestStreak}</div><div class="l">Best streak</div></div>
