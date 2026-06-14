@@ -248,6 +248,13 @@
   body.quiz-playing .hero,body.quiz-playing .tool-head,body.quiz-playing .foot{display:none}
   .qquick{width:100%;margin-bottom:4px;font:inherit;font-weight:800;font-size:17px;cursor:pointer;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;border:none;border-radius:14px;padding:17px;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 12px 26px -10px rgba(37,99,235,.6)}
   .qquick small{font-weight:600;font-size:13px;opacity:.85}
+  .qdaily{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;font:inherit;cursor:pointer;background:linear-gradient(135deg,#0F172A,#1E293B);color:#fff;border:none;border-radius:14px;padding:15px 18px;margin-bottom:11px;box-shadow:var(--shadow)}
+  .qdaily-l b{display:block;font-size:15.5px;font-weight:800}
+  .qdaily-l small{display:block;font-size:11.5px;color:#A9B6CC;font-weight:500;margin-top:2px}
+  .qdaily-r{text-align:center;flex:none;min-width:54px}
+  .qdaily-r b{display:block;font-size:18px;font-weight:800;color:#FBBF24}
+  .qdaily-r small{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#A9B6CC;margin-top:1px}
+  .qdaily:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .qcustom-label{text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin:14px 0 2px}
   @media (hover:none){.kbd-hint{display:none}}
   .qtop{position:sticky;top:0;z-index:16;background:var(--bg-soft);padding:10px 0 6px}
@@ -303,6 +310,7 @@
   .qr-diff.medium{color:var(--accent);background:var(--accent-soft);border:1px solid rgba(37,99,235,.22)}
   .qr-diff.hard{color:var(--gold-deep);background:var(--gold-soft);border:1px solid rgba(184,134,11,.32)}
   .qr-mode{color:var(--soft);background:var(--bg-soft);border:1px solid var(--line-2)}
+  .qr-diff.daily{color:#fff;background:#0F172A;border:1px solid #0F172A}
   .qr-grade{font-size:clamp(66px,18vw,108px);font-weight:800;line-height:.9;letter-spacing:-.04em}
   .qr-grade.gA{color:var(--good)} .qr-grade.gB{color:var(--accent)} .qr-grade.gC{color:#CA8A04} .qr-grade.gD{color:#EA580C} .qr-grade.gF{color:var(--bad)}
   .qr-rating{margin-top:6px;font-size:14px;font-weight:700;color:var(--ink-2)}
@@ -409,6 +417,7 @@
     .opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
     .row-item .sp:hover{color:var(--gold-deep);background:var(--gold-soft)}
     .qquit:hover{border-color:var(--accent);color:var(--accent)}
+    .qdaily:hover{transform:translateY(-2px)}
   }
 </style>
 </head>
@@ -837,7 +846,7 @@ function qdiff(d){return EASY.has(d.c)?'easy':HARD.has(d.c)?'hard':'medium';}
 let qPhase='setup';
 let qCfg={count:10,diff:'medium',mode:'capital',region:'All'};
 let qList=[],qIdx=0,qScore=0,qStreak=0,qBestStreak=0,qCorrect=0,qSpeedSum=0,qMissed=[];
-let qAnswered=false,qTimer=null,qStart=0,qTotalMs=0;
+let qAnswered=false,qTimer=null,qStart=0,qTotalMs=0,qSeed=0,qDaily=false,qChal=null;
 
 function qClearTimer(){if(qTimer){clearInterval(qTimer);qTimer=null;}}
 function qPool(){
@@ -845,26 +854,37 @@ function qPool(){
   if(qCfg.region!=='All')p=p.filter(d=>d.r===qCfg.region);
   return p.filter(d=>qdiff(d)===qCfg.diff);
 }
-function qDistract(item,kind){
+function qSeedRng(a){a=a>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffleR(a,rng){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function qDistractR(item,kind,rng){
   const all=DATA.filter(d=>!d.cap.includes('(')&&d.c!==item.c);
   const val=d=>kind==='cap'?d.cap:d.c;
   const out=[],seen=new Set([val(item)]);
-  for(const d of [...shuffle(all.filter(d=>d.r===item.r)),...shuffle(all)]){
+  for(const d of [...shuffleR(all.filter(d=>d.r===item.r),rng),...shuffleR(all,rng)]){
     const v=val(d);if(!seen.has(v)){seen.add(v);out.push(v);}if(out.length===3)break;
   }
   return out;
 }
-function qBuild(){
-  const pool=shuffle(qPool());
-  const n=Math.min(qCfg.count,pool.length);
+function qBuildSeeded(seed,cfg){
+  qSeed=seed>>>0;
+  const rng=qSeedRng(qSeed);
+  let pool=DATA.filter(d=>!d.cap.includes('('));
+  if(cfg.region&&cfg.region!=='All')pool=pool.filter(d=>d.r===cfg.region);
+  if(cfg.diff)pool=pool.filter(d=>qdiff(d)===cfg.diff);
+  pool=shuffleR(pool,rng);
+  const n=Math.min(cfg.count,pool.length);
   qList=pool.slice(0,n).map(item=>{
-    const sub=qCfg.mode==='mixed'?(Math.random()<.5?'capital':'country'):qCfg.mode;
+    const sub=cfg.mode==='mixed'?(rng()<.5?'capital':'country'):cfg.mode;
     const kind=sub==='capital'?'cap':'country';
     const answer=kind==='cap'?item.cap:item.c;
-    return {item,kind,answer,opts:shuffle([answer,...qDistract(item,kind)])};
+    return {item,kind,answer,opts:shuffleR([answer,...qDistractR(item,kind,rng)],rng)};
   });
   qIdx=0;qScore=0;qStreak=0;qBestStreak=0;qCorrect=0;qSpeedSum=0;qMissed=[];qTotalMs=0;
 }
+function qBuild(){qDaily=false;qChal=null;qBuildSeeded((Math.random()*2147483647)|0,qCfg);}
+function qDailyKey(d){d=d||new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function qDailySeed(){const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
+function qBuildDaily(){qDaily=true;qChal=null;qBuildSeeded(qDailySeed(),{count:10,mode:'mixed',diff:null,region:'All'});}
 function fmtTime(s){s=Math.floor(s);const m=Math.floor(s/60),r=s%60;return m+':'+(r<10?'0':'')+r;}
 
 function qMaxScore(n){let s=0;for(let i=1;i<=n;i++)s+=1000*Math.min(1+0.2*(i-1),2);return s;}
@@ -884,6 +904,8 @@ function renderQuizSetup(){
   const avail=qPool().length;
   const eff=Math.min(qCfg.count,avail);
   const bestR=parseInt(localStorage.getItem('wc_grade_'+qCfg.diff)||'0',10);
+  const dstreak=parseInt(localStorage.getItem('wc_daily_streak')||'0',10);
+  const ddone=localStorage.getItem('wc_daily_last')===qDailyKey();
   const counts=QSET_COUNTS.map(c=>`<button class="qpill${qCfg.count===c?' on':''}" data-set="count" data-val="${c}"${(c>avail&&avail>0)?' disabled':''}>${c}</button>`).join('');
   const diffs=QDIFFS.map(o=>`<button class="qpill col${qCfg.diff===o.k?' on':''}" data-set="diff" data-val="${o.k}"><span>${o.label}</span><small>${o.desc}</small></button>`).join('');
   const modes=QMODES.map(o=>`<button class="qpill col${qCfg.mode===o.k?' on':''}" data-set="mode" data-val="${o.k}"><span>${o.label}</span><small>${o.desc}</small></button>`).join('');
@@ -891,6 +913,10 @@ function renderQuizSetup(){
   app.innerHTML=`
     <div class="qsetup">
       <div class="qsetup-head"><h2>Quiz mode</h2><p>Jump straight in, or build your own challenge.</p></div>
+      <button class="qdaily" id="qdaily">
+        <span class="qdaily-l"><b>&#127757; Today&#39;s Challenge</b><small>${ddone?'Completed today &mdash; play again':'10 capitals, the same for everyone today'}</small></span>
+        <span class="qdaily-r">${dstreak>0?`<b>&#128293; ${dstreak}</b><small>day streak</small>`:'<b>Play &rarr;</b>'}</span>
+      </button>
       <button class="qquick" id="qquick">&#9889;&nbsp; Quick Play <small>10 &middot; Medium &middot; Mixed</small></button>
       <div class="qcustom-label">or customize</div>
       <div class="qgroup"><div class="qglabel">How many questions</div><div class="qrow">${counts}</div></div>
@@ -900,6 +926,7 @@ function renderQuizSetup(){
       ${bestR?`<div class="qbest">Your best on ${qDiffLabel(qCfg.diff)}: <b>${qGrade(bestR)}</b> &middot; ${bestR}/100</div>`:''}
       <button class="qstart" id="qstart"${avail<1?' disabled':''}>${avail<1?'No capitals match &mdash; widen your filters':'Start quiz &middot; '+eff+' question'+(eff===1?'':'s')}<svg class="ico" width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>`;
+  $('#qdaily').addEventListener('click',()=>{qBuildDaily();qPhase='play';render();});
   $('#qquick').addEventListener('click',()=>{qCfg={count:10,diff:'medium',mode:'mixed',region:'All'};qBuild();qPhase='play';render();});
   app.querySelectorAll('.qpill').forEach(b=>{if(b.disabled)return;b.addEventListener('click',()=>{const s=b.dataset.set;qCfg[s]=s==='count'?+b.dataset.val:b.dataset.val;render();});});
   $('#qregion').addEventListener('change',e=>{qCfg.region=e.target.value;render();});
@@ -992,14 +1019,14 @@ function qResultCanvas(grade,rating,dl,n){
   try{x.letterSpacing='0px';}catch(e){}
   x.fillStyle=qShareColor(rating);x.font='800 300px "Plus Jakarta Sans",sans-serif';x.fillText(grade,S/2,540);
   x.fillStyle='#0F172A';x.font='800 64px "Plus Jakarta Sans",sans-serif';x.fillText(rating+' / 100',S/2,640);
-  x.fillStyle='#475569';x.font='600 38px "Plus Jakarta Sans",sans-serif';x.fillText(dl+'   ·   '+qModeLabel(qCfg.mode)+' mode',S/2,716);
+  x.fillStyle='#475569';x.font='600 38px "Plus Jakarta Sans",sans-serif';x.fillText(qDaily?'Daily Challenge':(dl+'   ·   '+qModeLabel(qCfg.mode)+' mode'),S/2,716);
   x.fillStyle='#0F172A';x.font='700 42px "Plus Jakarta Sans",sans-serif';x.fillText(qCorrect+'/'+n+' correct    ·    streak '+qBestStreak,S/2,800);
   x.fillStyle='#0F172A';x.font='800 56px "Plus Jakarta Sans",sans-serif';x.fillText('Can you beat me?',S/2,928);
   x.fillStyle='#2563EB';x.font='800 46px "Plus Jakarta Sans",sans-serif';x.fillText('worldcapitals.co',S/2,1002);
   return c;
 }
 function qShare(grade,rating,dl,n){
-  const txt=`I scored ${grade} (${rating}/100) on ${dl} mode, ${qCorrect}/${n} on the World Capitals quiz. Can you beat me?`;
+  const txt=qDaily?`I scored ${grade} (${rating}/100) on today's World Capitals Daily Challenge, ${qCorrect}/${n} right. Can you beat me?`:`I scored ${grade} (${rating}/100) on ${dl} mode, ${qCorrect}/${n} on the World Capitals quiz. Can you beat me?`;
   const url='https://www.worldcapitals.co';
   const go=()=>{
     let c;try{c=qResultCanvas(grade,rating,dl,n);}catch(e){c=null;}
@@ -1022,15 +1049,25 @@ function renderQuizDone(){
   const n=qList.length,acc=n?Math.round(qCorrect/n*100):0,tot=qTotalMs/1000,avg=n?tot/n:0;
   const rating=n?Math.round(qCorrect/n*100):0;const grade=qGrade(rating),gcls=qGradeCls(rating);
   const dl=qDiffLabel(qCfg.diff);
-  const key='wc_grade_'+qCfg.diff;
+  let dstreak=parseInt(localStorage.getItem('wc_daily_streak')||'0',10);
+  if(qDaily){
+    const today=qDailyKey();
+    if(localStorage.getItem('wc_daily_last')!==today){
+      const y=new Date();y.setDate(y.getDate()-1);
+      dstreak=(localStorage.getItem('wc_daily_last')===qDailyKey(y))?dstreak+1:1;
+      localStorage.setItem('wc_daily_streak',String(dstreak));
+      localStorage.setItem('wc_daily_last',today);
+    }
+  }
+  const bestName=qDaily?'the Daily':dl;
+  const key=qDaily?'wc_grade_daily':'wc_grade_'+qCfg.diff;
   const prev=parseInt(localStorage.getItem(key)||'0',10);
   const isNew=rating>prev;if(isNew)localStorage.setItem(key,String(rating));
-  const bestLine=isNew?'&#9733; New best on '+dl+'!':(prev>0?'Your best on '+dl+': '+qGrade(prev)+' &middot; '+prev+'/100':'&nbsp;');
+  const bestLine=isNew?'&#9733; New best on '+bestName+'!':(prev>0?'Your best on '+bestName+': '+qGrade(prev)+' &middot; '+prev+'/100':'&nbsp;');
   app.innerHTML=`
     <div class="qresult">
       <div class="qr-badges">
-        <span class="qr-diff ${qCfg.diff}">${dl}</span>
-        <span class="qr-mode">${qModeLabel(qCfg.mode)} mode</span>
+        ${qDaily?`<span class="qr-diff daily">&#127757; Daily Challenge</span><span class="qr-mode">&#128293; ${dstreak} day streak</span>`:`<span class="qr-diff ${qCfg.diff}">${dl}</span><span class="qr-mode">${qModeLabel(qCfg.mode)} mode</span>`}
       </div>
       <div class="qr-grade ${gcls}">${grade}</div>
       <div class="qr-rating">${rating}<span>/100</span> &middot; ${qRank(acc)}</div>
