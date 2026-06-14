@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flag Hero — Experiment · World Capitals</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F8FB; --ink:#0F172A; --soft:#475569; --faint:#94A3B8; --accent:#2563EB;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden;background:var(--bg);
+    font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+  .stage{position:fixed;inset:0;overflow:hidden;
+    background:radial-gradient(60% 55% at 50% 18%, #EAF1FE 0%, #F6F8FB 60%, #EEF2F7 100%);cursor:grab}
+  .stage:active{cursor:grabbing}
+  .grid{position:absolute;inset:0;opacity:.5;pointer-events:none;
+    background-image:linear-gradient(#E2E8F0 1px,transparent 1px),linear-gradient(90deg,#E2E8F0 1px,transparent 1px);
+    background-size:46px 46px;-webkit-mask-image:radial-gradient(70% 60% at 50% 40%,#000,transparent 78%);
+            mask-image:radial-gradient(70% 60% at 50% 40%,#000,transparent 78%)}
+
+  /* center text */
+  .intro{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;z-index:2;pointer-events:none;width:90%}
+  .intro h1{font-size:clamp(28px,5vw,52px);font-weight:800;letter-spacing:-.03em;line-height:1.04}
+  .intro h1 .hl{color:var(--accent)}
+  .intro .cue{margin-top:18px;font-size:12px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+  .intro .cue span{display:inline-block;animation:bob 2s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(5px);opacity:1}}
+
+  .arc-content{position:absolute;left:50%;top:8%;transform:translateX(-50%);text-align:center;z-index:2;pointer-events:none;width:90%;opacity:0}
+  .arc-content h2{font-size:clamp(26px,4.4vw,46px);font-weight:800;letter-spacing:-.03em}
+  .arc-content h2 .hl{color:var(--accent)}
+  .arc-content p{margin-top:14px;color:var(--soft);font-size:clamp(14px,1.8vw,17px);max-width:520px;margin-left:auto;margin-right:auto}
+
+  /* cards */
+  .cards{position:absolute;inset:0;z-index:1}
+  .fcard{position:absolute;left:50%;top:50%;width:66px;height:92px;
+    will-change:transform;perspective:1000px}
+  .finner{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+    transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+  .fcard:hover .finner{transform:rotateY(180deg)}
+  .fface{position:absolute;inset:0;border-radius:11px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    box-shadow:0 10px 22px -8px rgba(15,23,42,.35),0 2px 6px -2px rgba(15,23,42,.2)}
+  .ffront{background:#fff;border:1px solid rgba(15,23,42,.08)}
+  .ffront img{width:100%;height:100%;object-fit:cover;display:block}
+  .fback{background:linear-gradient(160deg,#1D2A44,#0F172A);color:#fff;transform:rotateY(180deg);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6px;border:1px solid #233152}
+  .fback .lab{font-size:7px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#7FB2FF;margin-bottom:3px}
+  .fback .nm{font-size:10px;font-weight:700;line-height:1.15}
+
+  .note{position:absolute;left:0;right:0;bottom:14px;text-align:center;z-index:3;
+    font-size:11.5px;color:var(--faint);font-weight:600;letter-spacing:.02em;pointer-events:none}
+  .home{position:absolute;top:16px;left:18px;z-index:5;font-size:12px;font-weight:700;color:var(--accent);
+    text-decoration:none;background:#fff;border:1px solid #E2E8F0;padding:8px 14px;border-radius:999px;
+    box-shadow:0 4px 12px -6px rgba(15,23,42,.2)}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="grid"></div>
+
+  <div class="intro" id="intro">
+    <h1>195 flags, <span class="hl">in orbit.</span></h1>
+    <div class="cue"><span>Scroll to explore ↓</span></div>
+  </div>
+
+  <div class="arc-content" id="arcContent">
+    <h2>Every flag. <span class="hl">Every capital.</span></h2>
+    <p>The whole world, fanned out. Hover any flag to see its country.</p>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="note">Experiment · scroll up/down (or swipe) to morph · hover a flag to flip · move your mouse for parallax</div>
+</div>
+<a class="home" href="/">← Back to site</a>
+
+<script>
+/* ---- flags (ISO2 -> country) ---- */
+const FLAGS=[
+  ["us","United States"],["gb","United Kingdom"],["fr","France"],["de","Germany"],["it","Italy"],
+  ["es","Spain"],["pt","Portugal"],["ie","Ireland"],["nl","Netherlands"],["be","Belgium"],
+  ["ch","Switzerland"],["se","Sweden"],["no","Norway"],["dk","Denmark"],["gr","Greece"],
+  ["pl","Poland"],["jp","Japan"],["cn","China"],["kr","South Korea"],["in","India"],
+  ["th","Thailand"],["br","Brazil"],["ar","Argentina"],["cl","Chile"],["mx","Mexico"],
+  ["ca","Canada"],["au","Australia"],["za","South Africa"],["eg","Egypt"],["ke","Kenya"]
+];
+const N=FLAGS.length;
+const lerp=(a,b,t)=>a*(1-t)+b*t;
+const clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
+
+const cardsEl=document.getElementById('cards');
+const introEl=document.getElementById('intro');
+const arcEl=document.getElementById('arcContent');
+const stage=document.getElementById('stage');
+
+/* build cards */
+const cards=[];
+const scatter=[];
+FLAGS.forEach((f,i)=>{
+  const el=document.createElement('div');el.className='fcard';
+  el.innerHTML=`<div class="finner">
+    <div class="fface ffront"><img src="https://flagcdn.com/w160/${f[0]}.png" alt="${f[1]}" loading="eager"></div>
+    <div class="fface fback"><div class="lab">Country</div><div class="nm">${f[1]}</div></div>
+  </div>`;
+  cardsEl.appendChild(el);
+  cards.push(el);
+  // current animated state
+  el._s={x:(Math.random()-.5)*1500,y:(Math.random()-.5)*1000,rot:(Math.random()-.5)*180,sc:.5,op:0};
+  scatter.push({x:el._s.x,y:el._s.y,rot:el._s.rot,sc:.6,op:0});
+});
+
+/* phases */
+let phase='scatter';
+const params=new URLSearchParams(location.search);
+let virtualScroll=+params.get('scroll')||0;
+const MAX=1400;
+if(params.has('scroll')){phase='circle';}  // for static previews
+else{
+  setTimeout(()=>phase='line',450);
+  setTimeout(()=>phase='circle',2300);
+}
+
+/* input: virtual scroll */
+function addScroll(d){virtualScroll=clamp(virtualScroll+d,0,MAX);}
+stage.addEventListener('wheel',e=>{e.preventDefault();addScroll(e.deltaY);},{passive:false});
+let ty=0;
+stage.addEventListener('touchstart',e=>{ty=e.touches[0].clientY;},{passive:false});
+stage.addEventListener('touchmove',e=>{e.preventDefault();const y=e.touches[0].clientY;addScroll(ty-y);ty=y;},{passive:false});
+
+/* mouse parallax */
+let mouseTargetX=0,mouseX=0;
+stage.addEventListener('mousemove',e=>{
+  const r=stage.getBoundingClientRect();
+  mouseTargetX=(((e.clientX-r.left)/r.width)*2-1)*90;
+});
+
+/* smoothed scroll-derived values */
+let morph=0,shuffle=0;
+
+function targetFor(i,W,H){
+  if(phase==='scatter')return scatter[i];
+  if(phase==='line'){
+    const sp=72,tot=N*sp,x=i*sp-tot/2;
+    return {x,y:0,rot:0,sc:1,op:1};
+  }
+  // circle + arc morph
+  const isMobile=W<768;
+  const minD=Math.min(W,H);
+  const cR=Math.min(minD*0.34,330);
+  const cA=(i/N)*360, cRad=cA*Math.PI/180;
+  const circle={x:Math.cos(cRad)*cR,y:Math.sin(cRad)*cR,rot:cA+90};
+  const baseR=Math.min(W,H*1.5);
+  const arcR=baseR*(isMobile?1.4:1.05);
+  const apexY=H*(isMobile?0.34:0.24);
+  const arcCenterY=apexY+arcR;
+  const spread=isMobile?104:132;
+  const startA=-90-spread/2, step=spread/(N-1);
+  const maxRot=spread*0.8;
+  const bounded=-shuffle*maxRot;
+  const aAng=startA+i*step+bounded, aRad=aAng*Math.PI/180;
+  const arc={x:Math.cos(aRad)*arcR+mouseX, y:Math.sin(aRad)*arcR+arcCenterY, rot:aAng+90, sc:isMobile?1.35:1.7};
+  return {
+    x:lerp(circle.x,arc.x,morph),
+    y:lerp(circle.y,arc.y,morph),
+    rot:lerp(circle.rot,arc.rot,morph),
+    sc:lerp(1,arc.sc,morph),
+    op:1
+  };
+}
+
+function frame(){
+  const W=stage.clientWidth,H=stage.clientHeight;
+  // smooth global values
+  const mTarget=clamp(virtualScroll/600,0,1);
+  const sTarget=clamp((virtualScroll-600)/(MAX-600),0,1);
+  morph+=(mTarget-morph)*0.08;
+  shuffle+=(sTarget-shuffle)*0.08;
+  mouseX+=(mouseTargetX-mouseX)*0.06;
+
+  // text fades
+  introEl.style.opacity=String(clamp(1-morph*2,0,1));
+  introEl.style.filter=`blur(${morph*8}px)`;
+  const ac=clamp((morph-0.8)/0.2,0,1);
+  arcEl.style.opacity=String(ac);
+  arcEl.style.transform=`translateX(-50%) translateY(${(1-ac)*20}px)`;
+
+  for(let i=0;i<N;i++){
+    const t=targetFor(i,W,H);
+    const s=cards[i]._s;
+    const k=phase==='scatter'?0.12:0.09;
+    s.x+=(t.x-s.x)*k; s.y+=(t.y-s.y)*k;
+    s.rot+=(t.rot-s.rot)*k; s.sc+=(t.sc-s.sc)*k; s.op+=(t.op-s.op)*0.1;
+    cards[i].style.opacity=s.op.toFixed(3);
+    cards[i].style.transform=`translate(-50%,-50%) translate(${s.x.toFixed(2)}px,${s.y.toFixed(2)}px) rotate(${s.rot.toFixed(2)}deg) scale(${s.sc.toFixed(3)})`;
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
