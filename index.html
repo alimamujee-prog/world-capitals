@@ -80,6 +80,10 @@
   .hero-sub{color:var(--soft);font-size:clamp(16px,2.3vw,19px);max-width:540px;
     margin:26px auto 0;line-height:1.65}
   .hero-sub b{color:var(--ink-2);font-weight:600}
+  .hero-dedicate{position:relative;margin:22px auto 0;max-width:470px;padding-top:22px;
+    font-size:14.5px;font-style:italic;font-weight:500;line-height:1.55;color:var(--ink-2)}
+  .hero-dedicate::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:42px;height:2px;border-radius:2px;background:var(--accent)}
 
   /* dark stats bar */
   .stats{display:flex;align-items:stretch;gap:0;margin-top:40px;
@@ -280,8 +284,9 @@
 <body>
 <!-- ============================== HERO ============================== -->
 <header class="hero">
-  <h1>The whole world, <span class="hl">from memory.</span></h1>
-  <p class="hero-sub">Every capital on Earth: the <b>193 UN member states</b> plus Vatican City and Palestine. Flip them, quiz yourself, and hear the tricky ones spoken aloud.</p>
+  <h1>World <span class="hl">Capitals</span></h1>
+  <p class="hero-sub">Every UN recognized world capital. Browse them, flip them, quiz yourself, and hear the hard ones spoken aloud.</p>
+  <p class="hero-dedicate">To my Khatri family, the most beautiful, generous, and loving people in the world.</p>
 
   <div class="stats">
     <div class="stat"><div class="n" id="counter">195</div><div class="l">Capitals</div></div>
