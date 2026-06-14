@@ -200,50 +200,107 @@
   .bar i{display:block;height:100%;width:0;transition:width .4s cubic-bezier(.2,.8,.2,1);
     background:var(--accent);border-radius:999px}
 
-  /* ---------- QUIZ ---------- */
-  .quiz{background:linear-gradient(150deg,#FFFFFF 0%,#F8FAFC 55%,#F1F5F9 100%);border:1px solid var(--line);border-radius:var(--r);padding:36px 28px;box-shadow:var(--shadow)}
+    /* ---------- QUIZ ---------- */
+  /* setup */
+  .qsetup{max-width:560px;margin:0 auto;background:linear-gradient(150deg,#FFFFFF,#F8FAFC 55%,#F1F5F9);
+    border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:30px 26px 26px}
+  .qsetup-head{text-align:center;margin-bottom:20px}
+  .qsetup-head h2{font-size:25px;font-weight:800;letter-spacing:-.02em;margin:0 0 5px;color:var(--ink)}
+  .qsetup-head p{margin:0;color:var(--soft);font-size:14px}
+  .qgroup{margin-top:18px}
+  .qglabel{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 2px 9px}
+  .qrow{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .qpill{font:inherit;font-weight:700;font-size:15px;color:var(--soft);cursor:pointer;
+    background:var(--card);border:1.5px solid var(--line-2);border-radius:12px;padding:13px 8px;
+    transition:.15s;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:var(--shadow-sm)}
+  .qpill small{font-size:11px;font-weight:500;color:var(--faint);letter-spacing:0;text-transform:none}
+  .qpill:hover:not(:disabled){border-color:var(--accent);color:var(--ink)}
+  .qpill.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);box-shadow:0 5px 14px -5px rgba(37,99,235,.45)}
+  .qpill.on small{color:var(--accent)}
+  .qpill:disabled{opacity:.4;cursor:not-allowed}
+  .qpill:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .qregion{width:100%}
+  .qbest{text-align:center;margin-top:20px;font-size:13px;color:var(--soft)}
+  .qbest b{color:var(--ink);font-weight:800}
+  .qstart{width:100%;margin-top:20px;font:inherit;font-weight:700;font-size:16px;cursor:pointer;
+    background:var(--accent);color:#fff;border:none;border-radius:13px;padding:16px;
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    box-shadow:0 12px 26px -10px rgba(37,99,235,.6);transition:.16s}
+  .qstart:hover:not(:disabled){background:var(--accent-deep);transform:translateY(-2px)}
+  .qstart:disabled{background:var(--faint);box-shadow:none;cursor:not-allowed}
+  .qstart:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+  /* play HUD */
+  .qhud{display:flex;gap:10px;margin-bottom:12px}
+  .qhud-s{flex:1;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:10px 14px;box-shadow:var(--shadow-sm)}
+  .qhud-s.mid{text-align:center}
+  .qhud-s.end{text-align:right}
+  .qhud-s .lab{display:block;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:1px}
+  .qhud-s b{font-size:21px;font-weight:800;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums}
+  .qhud-s.mid b{color:var(--accent)}
+  .qhud-s b span{font-size:13px;font-weight:600;color:var(--faint)}
+  .qstreakbar{display:flex;align-items:center;justify-content:space-between;min-height:22px;margin:0 4px 10px}
+  .qstreak{font-size:13px;font-weight:800;color:var(--gold-deep)}
+  .qpts{font-size:15px;font-weight:800;color:var(--good);opacity:0}
+  .qpts.show{animation:ptsPop 1s ease both}
+  @keyframes ptsPop{0%{opacity:0;transform:translateY(8px) scale(.9)}22%{opacity:1;transform:translateY(0) scale(1.06)}100%{opacity:0;transform:translateY(-12px)}}
+  .qtimer{height:8px;background:#DCE3EC;border-radius:999px;overflow:hidden;margin-bottom:16px}
+  .qtimer i{display:block;height:100%;width:100%;background:var(--accent);border-radius:999px;transition:width .12s linear,background .3s}
+  .qtimer i.warn{background:#E0A106}
+  .qtimer i.danger{background:var(--bad)}
+
+  /* question card */
+  .quiz{background:linear-gradient(150deg,#FFFFFF,#F8FAFC 55%,#F1F5F9);border:1px solid var(--line);border-radius:var(--r);padding:34px 28px;box-shadow:var(--shadow)}
   .qflag{font-size:48px;text-align:center;line-height:1;margin-bottom:10px}
-  .qp{text-align:center;color:var(--accent);font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
-  .qc{text-align:center;font-size:clamp(26px,6vw,40px);font-weight:800;margin:8px 0 4px;line-height:1.05;letter-spacing:-.025em;color:var(--ink)}
-  .qsay{text-align:center;font-size:14px;color:var(--soft);font-weight:500;margin-bottom:26px}
+  .qmark{width:62px;height:62px;margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:32px;font-weight:800;color:var(--accent);background:var(--accent-soft);border:2px solid rgba(37,99,235,.25)}
+  .qp{text-align:center;color:var(--accent);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+  .qc{text-align:center;font-size:clamp(24px,5.5vw,38px);font-weight:800;margin:8px 0 4px;line-height:1.06;letter-spacing:-.02em;color:var(--ink)}
+  .qsay{text-align:center;font-size:13.5px;color:var(--soft);font-weight:500;margin-bottom:24px}
   .opts{display:grid;gap:11px}
-  .opt{font:inherit;font-size:15px;font-weight:600;text-align:left;background:var(--card);
-    border:1px solid var(--line-2);border-radius:13px;padding:16px 18px;cursor:pointer;color:var(--ink);
-    transition:.14s;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm)}
+  .opt{font:inherit;font-size:15px;font-weight:600;text-align:left;background:var(--card);border:1px solid var(--line-2);border-radius:13px;padding:16px 18px;cursor:pointer;color:var(--ink);transition:.14s;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm)}
   .opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
   .opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .opt .k{font-size:12px;font-weight:700;color:var(--soft);background:var(--bg-soft);border:1px solid var(--line);border-radius:8px;
-    width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex:none}
+  .opt .k{font-size:12px;font-weight:700;color:var(--soft);background:var(--bg-soft);border:1px solid var(--line);border-radius:8px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex:none}
   .opt.correct{border-color:var(--good);background:var(--good-soft);color:#14532D}
   .opt.correct .k{border-color:var(--good);color:var(--good);background:#fff}
   .opt.wrong{border-color:var(--bad);background:var(--bad-soft);color:#7F1D1D}
   .opt.wrong .k{border-color:var(--bad);color:var(--bad);background:#fff}
   .opt:disabled{cursor:default}
-  .fb{min-height:24px;text-align:center;margin-top:20px;font-size:14.5px;font-weight:700}
+  .fb{min-height:24px;text-align:center;margin-top:18px;font-size:15px;font-weight:800}
+  .fb.good{color:var(--good)}
+  .fb.bad{color:var(--bad)}
   .fb .ph{font-weight:500;color:var(--soft)}
-  .qnextwrap{display:flex;justify-content:center;margin-top:16px}
-  .qnext{font:inherit;font-weight:600;font-size:14px;background:var(--accent);color:#fff;
-    border:none;border-radius:12px;padding:13px 32px;cursor:pointer;box-shadow:0 8px 18px -8px rgba(37,99,235,.5)}
-  .qnext:hover{background:var(--accent-deep);transform:translateY(-1px)}
-  .qnext:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .chips{display:flex;gap:18px;justify-content:center;margin-top:20px;font-size:12.5px;color:var(--soft);font-weight:500}
-  .chips b{font-weight:800}
-  .chips .g b{color:var(--good)}
-  .chips .w b{color:var(--bad)}
 
-  .done{text-align:center;padding:54px 20px;background:linear-gradient(150deg,#FFFFFF 0%,#F8FAFC 55%,#F1F5F9 100%);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
-  .done .score{font-size:clamp(56px,16vw,92px);font-weight:800;line-height:1;letter-spacing:-.04em;color:var(--accent)}
-  .done .meta{color:var(--ink-2);margin:8px 0 4px;font-size:15px;font-weight:600}
-  .done .best{color:var(--faint);font-size:12.5px;font-weight:600;margin:0 0 26px}
-  .done .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-  .done button{font:inherit;font-weight:600;font-size:14px;border-radius:12px;padding:13px 24px;cursor:pointer;
-    border:1px solid var(--line-2);background:var(--card);color:var(--ink);transition:.16s;box-shadow:var(--shadow-sm)}
-  .done button:hover{border-color:var(--accent);color:var(--accent)}
-  .done button.key{background:var(--accent);color:#fff;border:none}
-  .done button.key:hover{background:var(--accent-deep);color:#fff}
-  .done button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  /* result */
+  .qresult{max-width:560px;margin:0 auto;text-align:center;background:linear-gradient(150deg,#FFFFFF,#F8FAFC 55%,#F1F5F9);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:38px 26px 28px}
+  .qr-rank{font-size:14px;font-weight:800;letter-spacing:.03em;color:var(--accent);text-transform:uppercase}
+  .qr-score{font-size:clamp(52px,15vw,84px);font-weight:800;line-height:1;letter-spacing:-.04em;color:var(--ink);margin:6px 0 2px}
+  .qr-score span{font-size:20px;font-weight:700;color:var(--faint);letter-spacing:0;margin-left:6px}
+  .qr-sub{color:var(--soft);font-size:13.5px;font-weight:600;margin-bottom:24px}
+  .qr-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
+  .qr-stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 8px;box-shadow:var(--shadow-sm)}
+  .qr-stat .n{font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+  .qr-stat .l{font-size:10.5px;font-weight:600;color:var(--faint);margin-top:4px}
+  .qr-row{display:flex;gap:11px;justify-content:center}
+  .qr-row .qstart{margin-top:0;flex:1;max-width:230px}
+  .qr-alt{font:inherit;font-weight:700;font-size:15px;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line-2);border-radius:13px;padding:16px 20px;transition:.16s;box-shadow:var(--shadow-sm)}
+  .qr-alt:hover{border-color:var(--accent);color:var(--accent)}
+  .qr-alt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .qreview{margin-top:24px;text-align:left;border-top:1px solid var(--line);padding-top:18px}
+  .qreview.perfect{text-align:center;color:var(--good);font-weight:700;font-size:14px}
+  .qrev-h{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+  .qrev-item{display:flex;justify-content:space-between;gap:14px;padding:10px 4px;border-bottom:1px solid var(--line);font-size:14px}
+  .qrev-c{color:var(--ink);font-weight:600;min-width:0}
+  .qrev-a{color:var(--accent);font-weight:700;text-align:right;flex:none}
+  @media (max-width:560px){
+    .qr-stats{grid-template-columns:repeat(2,1fr)}
+    .qhud-s b{font-size:18px}
+    .qr-row{flex-direction:column}
+    .qr-row .qstart,.qr-alt{max-width:none;width:100%}
+  }
 
-  /* ---------- LIST ---------- */
+/* ---------- LIST ---------- */
   .list{margin-top:4px}
   .group{margin-top:14px}
   .group:first-child{margin-top:6px}
@@ -644,14 +701,16 @@ function setTabUI(){
   $('#t-list').setAttribute('aria-selected',tab==='list');
   $('#searchField').style.display=tab==='list'?'inline-flex':'none';
   $('#shuffle').style.display=tab==='list'?'none':'inline-flex';
+  document.querySelector('.toolbar').style.display=tab==='quiz'?'none':'flex';
   buildVoiceSelect();
 }
 function setCount(){
   const c=$('#count');
+  if(tab==='quiz'){c.innerHTML='';return;}
   if(tab==='list'){const n=listData().length;c.innerHTML=`<b>${n}</b> ${n===1?'country':'countries'}${region==='All'?'':' in '+region}`;}
   else c.innerHTML=`<b>${Math.min(idx+1,deck.length)}</b> of ${deck.length}${region==='All'?'':' · '+region}`;
 }
-function render(){setTabUI();setCount();if(tab==='cards')renderCards();else if(tab==='quiz')renderQuiz();else renderList();}
+function render(){setTabUI();setCount();if(tab==='cards')renderCards();else if(tab==='quiz')renderQuizTab();else renderList();}
 
 /* ---- FLASHCARDS ---- */
 function renderCards(){
@@ -697,60 +756,176 @@ function renderCards(){
 function next(){if(idx<deck.length-1){idx++;flipped=false;render();}}
 function prev(){if(idx>0){idx--;flipped=false;render();}}
 
-/* ---- QUIZ ---- */
-function distractorPool(){return DATA.filter(d=>!d.cap.includes('('));}
-function options(correct){
-  const pool=distractorPool().filter(d=>d.cap!==correct.cap);
-  return shuffle([correct.cap,...shuffle(pool).slice(0,3).map(d=>d.cap)]);
+/* ---- QUIZ (timed game engine) ---- */
+const Q_TIME=15;                      // seconds per question
+const QSET_COUNTS=[5,10,20];
+const QDIFFS=[
+  {k:'easy',label:'Easy',desc:'Famous nations'},
+  {k:'medium',label:'Medium',desc:'A real test'},
+  {k:'hard',label:'Hard',desc:'Deep cuts'}
+];
+const QMODES=[
+  {k:'capital',label:'Capital',desc:'Name the capital'},
+  {k:'country',label:'Country',desc:'Name the country'},
+  {k:'mixed',label:'Mixed',desc:'Keep me guessing'}
+];
+const EASY=new Set(["France","United Kingdom","Italy","Spain","Germany","Russia","China","Japan","India","United States","Mexico","Egypt","Greece","Portugal","Ireland","Austria","Cuba","Argentina","Thailand","Peru","South Korea","Sweden","Norway","Denmark","Finland","Belgium","Netherlands","Poland","Chile","Colombia","Hungary","Czechia"]);
+const HARD=new Set(["Kiribati","Tuvalu","Nauru","Palau","Micronesia","Marshall Islands","Vanuatu","Tonga","Samoa","Solomon Islands","Antigua and Barbuda","Dominica","Grenada","Saint Kitts and Nevis","Saint Lucia","Saint Vincent & the Grenadines","Burkina Faso","Burundi","Comoros","Equatorial Guinea","Eritrea","Eswatini","Gabon","Gambia","Guinea","Guinea-Bissau","Lesotho","Malawi","Mauritania","Niger","São Tomé and Príncipe","Sierra Leone","Togo","Benin","Cabo Verde","Central African Republic","Chad","Congo (Republic)","Seychelles","South Sudan","Liberia","Djibouti","Kyrgyzstan","Tajikistan","Turkmenistan","Armenia","Azerbaijan","Bhutan","Brunei","Laos","Maldives","Myanmar","Timor-Leste","Sri Lanka","Andorra","Liechtenstein","Malta","Montenegro","Moldova","North Macedonia","San Marino","Slovenia","Slovakia","Latvia","Lithuania","Estonia","Bahrain","Oman","Yemen","Suriname"]);
+function qdiff(d){return EASY.has(d.c)?'easy':HARD.has(d.c)?'hard':'medium';}
+
+let qPhase='setup';
+let qCfg={count:10,diff:'medium',mode:'capital',region:'All'};
+let qList=[],qIdx=0,qScore=0,qStreak=0,qBestStreak=0,qCorrect=0,qMissed=[];
+let qAnswered=false,qTimer=null,qStart=0,qTotalMs=0;
+
+function qClearTimer(){if(qTimer){clearInterval(qTimer);qTimer=null;}}
+function qPool(){
+  let p=DATA.filter(d=>!d.cap.includes('('));
+  if(qCfg.region!=='All')p=p.filter(d=>d.r===qCfg.region);
+  return p.filter(d=>qdiff(d)===qCfg.diff);
 }
-function renderQuiz(){
-  if(!deck.length){app.innerHTML='<div class="empty">No countries in this continent.</div>';return;}
-  if(idx>=deck.length){renderDone();return;}
-  const d=deck[idx];const opts=options(d);const pct=((idx+1)/deck.length)*100;
+function qDistract(item,kind){
+  const all=DATA.filter(d=>!d.cap.includes('(')&&d.c!==item.c);
+  const val=d=>kind==='cap'?d.cap:d.c;
+  const out=[],seen=new Set([val(item)]);
+  for(const d of [...shuffle(all.filter(d=>d.r===item.r)),...shuffle(all)]){
+    const v=val(d);if(!seen.has(v)){seen.add(v);out.push(v);}if(out.length===3)break;
+  }
+  return out;
+}
+function qBuild(){
+  const pool=shuffle(qPool());
+  const n=Math.min(qCfg.count,pool.length);
+  qList=pool.slice(0,n).map(item=>{
+    const sub=qCfg.mode==='mixed'?(Math.random()<.5?'capital':'country'):qCfg.mode;
+    const kind=sub==='capital'?'cap':'country';
+    const answer=kind==='cap'?item.cap:item.c;
+    return {item,kind,answer,opts:shuffle([answer,...qDistract(item,kind)])};
+  });
+  qIdx=0;qScore=0;qStreak=0;qBestStreak=0;qCorrect=0;qMissed=[];qTotalMs=0;
+}
+function fmtTime(s){s=Math.floor(s);const m=Math.floor(s/60),r=s%60;return m+':'+(r<10?'0':'')+r;}
+
+function renderQuizTab(){
+  if(qPhase==='play')renderQuizPlay();
+  else if(qPhase==='done')renderQuizDone();
+  else renderQuizSetup();
+}
+
+function renderQuizSetup(){
+  qClearTimer();
+  const avail=qPool().length;
+  const eff=Math.min(qCfg.count,avail);
+  const best=parseInt(localStorage.getItem('wc_quiz_best')||'0',10);
+  const counts=QSET_COUNTS.map(c=>`<button class="qpill${qCfg.count===c?' on':''}" data-set="count" data-val="${c}"${(c>avail&&avail>0)?' disabled':''}>${c}</button>`).join('');
+  const diffs=QDIFFS.map(o=>`<button class="qpill col${qCfg.diff===o.k?' on':''}" data-set="diff" data-val="${o.k}"><span>${o.label}</span><small>${o.desc}</small></button>`).join('');
+  const modes=QMODES.map(o=>`<button class="qpill col${qCfg.mode===o.k?' on':''}" data-set="mode" data-val="${o.k}"><span>${o.label}</span><small>${o.desc}</small></button>`).join('');
+  const regions=['All',...CONTINENTS.filter(r=>r!=='All')].map(r=>`<option value="${r}"${qCfg.region===r?' selected':''}>${r==='All'?'All continents':r}</option>`).join('');
   app.innerHTML=`
-    <div class="quiz">
-      <div class="qflag">${d.f}</div>
-      <div class="qp">Capital of</div>
-      <div class="qc">${d.c}</div>
-      <div class="qsay">${d.cp}</div>
-      <div class="opts" id="opts">
-        ${opts.map((o,i)=>`<button class="opt" data-cap="${encodeURIComponent(o)}"><span class="k">${i+1}</span><span>${o}</span></button>`).join('')}
-      </div>
-      <div class="fb" id="fb"></div>
-      <div class="qnextwrap" id="nx"></div>
-    </div>
-    <div class="bar"><i style="width:${pct}%"></i></div>
-    <div class="chips"><span class="g">Correct <b>${got}</b></span><span class="w">Review <b>${missed}</b></span></div>`;
-  const bs=Array.from(document.querySelectorAll('.opt'));
-  bs.forEach(b=>b.addEventListener('click',()=>answer(b,d,bs)));
-}
-function answer(btn,d,bs){
-  const chosen=decodeURIComponent(btn.dataset.cap);
-  bs.forEach(b=>{b.disabled=true;const cap=decodeURIComponent(b.dataset.cap);if(cap===d.cap)b.classList.add('correct');else if(b===btn)b.classList.add('wrong');});
-  const fb=$('#fb');
-  if(chosen===d.cap){got++;fb.innerHTML=`Correct. <span class="ph">${d.cap} · ${d.p}</span>`;fb.style.color='var(--aurora)';}
-  else{missed++;missedList.push(d);fb.innerHTML=`It's <b>${d.cap}</b>. <span class="ph">${d.p}</span>`;fb.style.color='var(--rose)';}
-  $('#nx').innerHTML=`<button class="qnext" id="qn">Next →</button>`;
-  $('#qn').addEventListener('click',()=>{idx++;render();});
-  $('#qn').focus();
-}
-function renderDone(){
-  const total=got+missed;const score=total?Math.round(got/total*100):0;
-  let best=parseInt(localStorage.getItem('wc_best')||'0',10);
-  let isNew=false;
-  if(score>best){best=score;isNew=true;localStorage.setItem('wc_best',String(best));}
-  app.innerHTML=`
-    <div class="done">
-      <div class="score">${score}%</div>
-      <p class="meta">${got} correct · ${missed} to review · ${total} questions</p>
-      <p class="best">${isNew?'★ New personal best!':'Personal best: '+best+'%'}</p>
-      <div class="row">
-        ${missedList.length?`<button class="key" id="drill">Drill the ${missedList.length} you missed</button>`:''}
-        <button id="again">Restart deck</button>
-      </div>
+    <div class="qsetup">
+      <div class="qsetup-head"><h2>Quiz mode</h2><p>Pick your challenge, then beat the clock for the high score.</p></div>
+      <div class="qgroup"><div class="qglabel">How many questions</div><div class="qrow">${counts}</div></div>
+      <div class="qgroup"><div class="qglabel">Difficulty</div><div class="qrow">${diffs}</div></div>
+      <div class="qgroup"><div class="qglabel">You name the&hellip;</div><div class="qrow">${modes}</div></div>
+      <div class="qgroup"><div class="qglabel">Region</div><select id="qregion" class="qregion" aria-label="Quiz region">${regions}</select></div>
+      ${best?`<div class="qbest">Personal best <b>${best.toLocaleString()}</b></div>`:''}
+      <button class="qstart" id="qstart"${avail<1?' disabled':''}>${avail<1?'No capitals match &mdash; widen your filters':'Start quiz &middot; '+eff+' question'+(eff===1?'':'s')}<svg class="ico" width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>`;
-  if(missedList.length)$('#drill').addEventListener('click',()=>{deck=shuffle(missedList);idx=0;got=0;missed=0;missedList=[];render();});
-  $('#again').addEventListener('click',()=>{buildDeck(true);render();});
+  app.querySelectorAll('.qpill').forEach(b=>{if(b.disabled)return;b.addEventListener('click',()=>{const s=b.dataset.set;qCfg[s]=s==='count'?+b.dataset.val:b.dataset.val;render();});});
+  $('#qregion').addEventListener('change',e=>{qCfg.region=e.target.value;render();});
+  $('#qstart').addEventListener('click',()=>{if(qPool().length<1)return;qBuild();qPhase='play';render();});
+}
+
+function renderQuizPlay(){
+  if(qIdx>=qList.length){qPhase='done';render();return;}
+  const q=qList[qIdx],it=q.item;qAnswered=false;
+  const prompt=q.kind==='cap'?'Capital of':'Which country has the capital';
+  const stem=q.kind==='cap'?it.c:clean(it.cap);
+  const stemSay=q.kind==='cap'?it.cp:it.p;
+  app.innerHTML=`
+    <div class="qhud">
+      <div class="qhud-s"><span class="lab">Question</span><b>${qIdx+1}<span>/${qList.length}</span></b></div>
+      <div class="qhud-s mid"><span class="lab">Score</span><b id="qscore">${qScore.toLocaleString()}</b></div>
+      <div class="qhud-s end"><span class="lab">Time</span><b id="qclock">0:00</b></div>
+    </div>
+    <div class="qstreakbar"><span class="qstreak" id="qstreak"></span><span class="qpts" id="qpts"></span></div>
+    <div class="qtimer"><i id="qtbar"></i></div>
+    <div class="quiz">
+      ${q.kind==='cap'?`<div class="qflag">${it.f}</div>`:`<div class="qmark">?</div>`}
+      <div class="qp">${prompt}</div>
+      <div class="qc">${stem}</div>
+      <div class="qsay">${stemSay}</div>
+      <div class="opts" id="opts">${q.opts.map((o,i)=>`<button class="opt" data-cap="${encodeURIComponent(o)}"><span class="k">${i+1}</span><span>${o}</span></button>`).join('')}</div>
+      <div class="fb" id="fb"></div>
+    </div>`;
+  const bs=Array.from(document.querySelectorAll('.opt'));
+  bs.forEach(b=>b.addEventListener('click',()=>qAnswer(b,q,bs,false)));
+  if(qStreak>=2)$('#qstreak').innerHTML='&#128293; '+qStreak+' streak';
+  qStart=performance.now();
+  qTimer=setInterval(()=>{
+    const now=performance.now(),el=(now-qStart)/1000,left=Math.max(0,Q_TIME-el);
+    const bar=$('#qtbar');if(bar){bar.style.width=(left/Q_TIME*100)+'%';bar.className=left<Q_TIME*.3?'danger':left<Q_TIME*.6?'warn':'';}
+    const clk=$('#qclock');if(clk)clk.textContent=fmtTime((qTotalMs+(now-qStart))/1000);
+    if(left<=0)qAnswer(null,q,bs,true);
+  },50);
+}
+
+function qAnswer(btn,q,bs,timeout){
+  if(qAnswered)return;qAnswered=true;qClearTimer();
+  const respMs=Math.min(performance.now()-qStart,Q_TIME*1000);
+  qTotalMs+=respMs;
+  const chosen=btn?decodeURIComponent(btn.dataset.cap):null;
+  const correct=chosen!==null&&chosen===q.answer;
+  bs.forEach(b=>{b.disabled=true;const v=decodeURIComponent(b.dataset.cap);if(v===q.answer)b.classList.add('correct');else if(b===btn)b.classList.add('wrong');});
+  const fb=$('#fb');let gained=0;
+  if(correct){
+    qCorrect++;qStreak++;if(qStreak>qBestStreak)qBestStreak=qStreak;
+    const speed=Math.max(0,(Q_TIME-respMs/1000)/Q_TIME);
+    const mult=Math.min(1+0.2*(qStreak-1),2);
+    gained=Math.round((500+500*speed)*mult);
+    qScore+=gained;
+    fb.className='fb good';fb.innerHTML=`Correct! <span class="ph">+${gained.toLocaleString()}${qStreak>=2?' &middot; '+mult.toFixed(1)+'&times;':''}</span>`;
+  }else{
+    qStreak=0;qMissed.push(q);
+    fb.className='fb bad';fb.innerHTML=`${timeout?'Out of time.':'Not quite.'} <span class="ph">It&#39;s <b>${q.answer}</b></span>`;
+  }
+  const sc=$('#qscore');if(sc)sc.textContent=qScore.toLocaleString();
+  const st=$('#qstreak');if(st)st.innerHTML=qStreak>=2?'&#128293; '+qStreak+' streak':'';
+  const pts=$('#qpts');if(pts&&gained){pts.textContent='+'+gained.toLocaleString();pts.classList.remove('show');void pts.offsetWidth;pts.classList.add('show');}
+  setTimeout(()=>{qIdx++;render();},1350);
+}
+
+function qRank(acc){
+  if(acc===100)return'&#127757; Cartographer Supreme';
+  if(acc>=90)return'Globe Master';
+  if(acc>=75)return'Seasoned Explorer';
+  if(acc>=50)return'Wandering Traveler';
+  return'Map in Training';
+}
+function renderQuizDone(){
+  qClearTimer();
+  const n=qList.length,acc=n?Math.round(qCorrect/n*100):0,tot=qTotalMs/1000,avg=n?tot/n:0;
+  const best=parseInt(localStorage.getItem('wc_quiz_best')||'0',10);
+  const isNew=qScore>best;if(isNew)localStorage.setItem('wc_quiz_best',String(qScore));
+  app.innerHTML=`
+    <div class="qresult">
+      <div class="qr-rank">${qRank(acc)}</div>
+      <div class="qr-score">${qScore.toLocaleString()}<span>pts</span></div>
+      <div class="qr-sub">${isNew?'&#9733; New personal best!':'Personal best '+best.toLocaleString()}</div>
+      <div class="qr-stats">
+        <div class="qr-stat"><div class="n">${qCorrect}/${n}</div><div class="l">Correct &middot; ${acc}%</div></div>
+        <div class="qr-stat"><div class="n">${qBestStreak}</div><div class="l">Best streak</div></div>
+        <div class="qr-stat"><div class="n">${avg.toFixed(1)}s</div><div class="l">Avg / question</div></div>
+        <div class="qr-stat"><div class="n">${fmtTime(tot)}</div><div class="l">Total time</div></div>
+      </div>
+      <div class="qr-row">
+        <button class="qstart" id="qplay">Play again</button>
+        <button class="qr-alt" id="qchange">Change settings</button>
+      </div>
+      ${qMissed.length?`<div class="qreview"><div class="qrev-h">Review the ${qMissed.length} you missed</div>${qMissed.map(m=>`<div class="qrev-item"><span class="qrev-c">${m.item.f} ${m.item.c}</span><span class="qrev-a">${m.item.cap}</span></div>`).join('')}</div>`:`<div class="qreview perfect">Flawless run. Not a single miss.</div>`}
+    </div>`;
+  $('#qplay').addEventListener('click',()=>{qBuild();qPhase='play';render();});
+  $('#qchange').addEventListener('click',()=>{qPhase='setup';render();});
 }
 
 /* ---- BROWSE (alphabetical by country) ---- */
@@ -810,11 +985,11 @@ function animateCounter(){
 /* =========================================================
    WIRING
    ========================================================= */
-function setTab(t){tab=t;if(t!=='list')buildDeck(t==='quiz');render();}
+function setTab(t){tab=t;qClearTimer();if(t==='cards')buildDeck(false);else if(t==='quiz')qPhase='setup';render();}
 $('#t-cards').addEventListener('click',()=>setTab('cards'));
 $('#t-quiz').addEventListener('click',()=>setTab('quiz'));
 $('#t-list').addEventListener('click',()=>setTab('list'));
-$('#region').addEventListener('change',e=>{region=e.target.value;if(tab!=='list')buildDeck(tab==='quiz');render();});
+$('#region').addEventListener('change',e=>{region=e.target.value;if(tab==='cards')buildDeck(false);render();});
 $('#shuffle').addEventListener('click',()=>{buildDeck(true);render();});
 $('#search').addEventListener('input',e=>{search=e.target.value;render();});
 $('#voice').addEventListener('change',e=>{
