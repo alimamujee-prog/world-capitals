@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Capitals — 195 from memory</title>
+<meta name="description" content="Every world capital, beautifully drilled. Browse, flip, and quiz your way through all 195 sovereign capitals — with pronunciations for the hard ones.">
+<meta name="theme-color" content="#0B0F1A">
+<!-- Open Graph / social -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="World Capitals — 195 from memory">
+<meta property="og:description" content="Browse, flip, and quiz your way through all 195 sovereign capitals, with pronunciations for the tricky ones.">
+<meta property="og:url" content="https://www.worldcapitals.co">
+<meta property="og:site_name" content="World Capitals">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="World Capitals — 195 from memory">
+<meta name="twitter:description" content="Browse, flip, and quiz your way through all 195 sovereign capitals.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230B0F1A'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23E8B04B' stroke-width='3'/%3E%3Cellipse cx='50' cy='50' rx='13' ry='30' fill='none' stroke='%23E8B04B' stroke-width='3'/%3E%3Cline x1='20' y1='50' x2='80' y2='50' stroke='%23E8B04B' stroke-width='3'/%3E%3Ccircle cx='50' cy='50' r='4' fill='%23F6C964'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0F1A;
+    --bg-2:#141A2A;
+    --card:#1A2236;
+    --card-2:#212B45;
+    --ink:#F4F1EA;
+    --soft:#A9B1C6;
+    --faint:#6B7390;
+    --gold:#E8B04B;
+    --gold-bright:#F6C964;
+    --gold-deep:#B8841F;
+    --aurora:#5AD6B0;
+    --rose:#F2789A;
+    --line:rgba(244,241,234,.08);
+    --line-2:rgba(244,241,234,.16);
+    --r:18px;
+    --maxw:760px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:'Hanken Grotesk',system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.55;
+    overflow-x:hidden;
+  }
+  ::selection{background:rgba(232,176,75,.28)}
+  a{color:inherit}
+
+  /* ======================================================
+     STARFIELD — fixed atmospheric backdrop
+     ====================================================== */
+  .sky{position:fixed;inset:0;z-index:-2;pointer-events:none;
+    background:
+      radial-gradient(120% 90% at 50% -20%, #1C2745 0%, #0E1424 45%, #0B0F1A 100%);
+  }
+  .stars{position:fixed;inset:-50% ;z-index:-1;pointer-events:none;opacity:.9;
+    background-image:
+      radial-gradient(1.4px 1.4px at 20px 30px, rgba(255,255,255,.55), transparent),
+      radial-gradient(1.2px 1.2px at 130px 80px, rgba(255,255,255,.40), transparent),
+      radial-gradient(1px 1px at 200px 160px, rgba(246,201,100,.55), transparent),
+      radial-gradient(1.6px 1.6px at 320px 50px, rgba(255,255,255,.45), transparent),
+      radial-gradient(1px 1px at 380px 220px, rgba(255,255,255,.35), transparent),
+      radial-gradient(1.2px 1.2px at 90px 260px, rgba(255,255,255,.40), transparent);
+    background-size:420px 320px;
+    animation:drift 140s linear infinite;
+  }
+  @keyframes drift{from{transform:translate3d(0,0,0)}to{transform:translate3d(-420px,-320px,0)}}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+
+  /* ======================================================
+     HERO
+     ====================================================== */
+  .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;padding:80px 20px 56px;}
+  .hero::before{content:"";position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);
+    width:min(820px,120vw);height:min(820px,120vw);pointer-events:none;
+    background:radial-gradient(circle, rgba(232,176,75,.18) 0%, rgba(232,176,75,.05) 35%, transparent 62%);
+    filter:blur(4px);}
+  .hero-eyebrow{position:relative;font-size:12px;letter-spacing:.34em;text-transform:uppercase;
+    color:var(--gold);font-weight:600;margin-bottom:26px;
+    display:inline-flex;align-items:center;gap:12px}
+  .hero-eyebrow::before,.hero-eyebrow::after{content:"";width:30px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-deep))}
+  .hero-eyebrow::after{background:linear-gradient(90deg,var(--gold-deep),transparent)}
+
+  .hero h1{position:relative;font-family:'Fraunces',serif;font-weight:900;
+    font-size:clamp(54px,13vw,138px);line-height:.92;letter-spacing:-.02em;margin:0;
+    font-optical-sizing:auto;}
+  .hero h1 .num{display:block;
+    background:linear-gradient(100deg,var(--gold-deep) 0%,var(--gold-bright) 30%,#FFF6E2 50%,var(--gold-bright) 70%,var(--gold-deep) 100%);
+    background-size:220% auto;-webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+    animation:shimmer 6s ease-in-out infinite;
+    text-shadow:0 0 60px rgba(232,176,75,.25);}
+  .hero h1 .mem{display:block;color:var(--ink);font-weight:400;font-style:italic;
+    font-size:clamp(26px,6.2vw,62px);margin-top:.12em;letter-spacing:-.01em}
+  @keyframes shimmer{0%,100%{background-position:0% center}50%{background-position:100% center}}
+
+  .hero-sub{position:relative;color:var(--soft);font-size:clamp(15px,2.4vw,18px);
+    max-width:520px;margin:30px auto 0;line-height:1.6}
+  .hero-sub b{color:var(--ink);font-weight:600}
+
+  .marquee{position:relative;width:100vw;left:50%;transform:translateX(-50%);
+    margin-top:40px;overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+            mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);}
+  .marquee-track{display:inline-flex;gap:30px;font-size:30px;line-height:1;white-space:nowrap;
+    padding:6px 0;animation:slide 60s linear infinite;will-change:transform}
+  @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  .cta-row{position:relative;display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:42px}
+  .btn{font:inherit;font-weight:600;font-size:15px;cursor:pointer;border-radius:999px;
+    padding:15px 30px;transition:transform .18s cubic-bezier(.2,.7,.2,1),box-shadow .18s,background .18s,border-color .18s;
+    border:1px solid transparent;display:inline-flex;align-items:center;gap:9px;text-decoration:none}
+  .btn-gold{background:linear-gradient(135deg,var(--gold-bright),var(--gold));color:#1A1206;
+    box-shadow:0 10px 30px -8px rgba(232,176,75,.6),inset 0 1px 0 rgba(255,255,255,.4)}
+  .btn-gold:hover{transform:translateY(-2px);box-shadow:0 16px 40px -10px rgba(232,176,75,.7),inset 0 1px 0 rgba(255,255,255,.4)}
+  .btn-ghost{background:rgba(244,241,234,.04);color:var(--ink);border-color:var(--line-2)}
+  .btn-ghost:hover{border-color:var(--gold);transform:translateY(-2px);background:rgba(232,176,75,.08)}
+  .btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+  .scrollcue{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
+    color:var(--faint);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    display:flex;flex-direction:column;align-items:center;gap:8px}
+  .scrollcue span{animation:bob 2.4s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(6px);opacity:1}}
+
+  /* ======================================================
+     TOOL
+     ====================================================== */
+  .tool{position:relative;padding-bottom:80px;scroll-margin-top:0}
+  .tool-head{position:sticky;top:0;z-index:20;
+    background:linear-gradient(180deg,rgba(11,15,26,.96),rgba(11,15,26,.82));
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);padding:14px 0}
+  .tool-head .wrap{display:flex;flex-direction:column;gap:14px}
+
+  /* segmented control */
+  .seg{display:inline-flex;background:var(--bg-2);border:1px solid var(--line);
+    border-radius:999px;padding:5px;gap:4px;align-self:center}
+  .seg button{appearance:none;border:none;background:none;font:inherit;font-weight:600;
+    font-size:14px;color:var(--soft);padding:9px 20px;border-radius:999px;cursor:pointer;
+    transition:color .2s,background .2s;white-space:nowrap}
+  .seg button:hover{color:var(--ink)}
+  .seg button[aria-selected="true"]{color:#1A1206;
+    background:linear-gradient(135deg,var(--gold-bright),var(--gold));
+    box-shadow:0 4px 14px -4px rgba(232,176,75,.55)}
+  .seg button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
+  .field{position:relative;display:inline-flex;align-items:center}
+  .field label{position:absolute;left:13px;top:-7px;font-size:9.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--faint);background:var(--bg);padding:0 5px}
+  select,input[type="search"]{font:inherit;font-size:13.5px;color:var(--ink);
+    background:var(--card);border:1px solid var(--line-2);border-radius:11px;padding:11px 14px}
+  select{cursor:pointer;padding-right:30px;
+    appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23A9B1C6' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 13px center}
+  select:focus,input:focus{outline:none;border-color:var(--gold)}
+  .linkbtn{appearance:none;background:none;border:none;font:inherit;font-size:13px;font-weight:600;
+    color:var(--gold);cursor:pointer;padding:9px 6px;border-radius:8px;display:inline-flex;align-items:center;gap:6px}
+  .linkbtn:hover{color:var(--gold-bright)}
+  .linkbtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  .count{max-width:var(--maxw);margin:20px auto 14px;padding:0 20px;
+    font-size:12.5px;color:var(--faint);letter-spacing:.02em}
+  .count b{color:var(--soft);font-weight:600}
+  #app{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+
+  /* ---------- FLASHCARD ---------- */
+  .stagecard{perspective:2000px}
+  .card{position:relative;width:100%;min-height:360px;cursor:pointer;
+    transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+  .card.flipped{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    background:linear-gradient(165deg,var(--card-2),var(--card));
+    border:1px solid var(--line-2);border-radius:var(--r);
+    box-shadow:0 30px 60px -30px rgba(0,0,0,.7),inset 0 1px 0 rgba(244,241,234,.05);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:40px 28px;overflow:hidden}
+  .face::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(120% 80% at 50% 0%, rgba(232,176,75,.07), transparent 60%)}
+  .face .tl{position:absolute;top:18px;left:20px;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--faint)}
+  .face .tr{position:absolute;top:18px;right:20px;font-size:11px;color:var(--faint);
+    font-variant-numeric:tabular-nums}
+  .flag{font-size:58px;line-height:1;margin-bottom:18px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+  .country{font-family:'Fraunces',serif;font-size:clamp(30px,7vw,46px);font-weight:900;
+    line-height:1.06;letter-spacing:-.015em}
+  .say{margin-top:12px;font-size:14.5px;color:var(--soft);font-style:italic;font-family:'Fraunces',serif}
+  .say b{font-style:normal;font-weight:600;color:var(--gold-bright);letter-spacing:.01em}
+  .hint{margin-top:24px;font-size:12px;color:var(--faint)}
+  .hint kbd{font-family:inherit;font-size:11px;border:1px solid var(--line-2);
+    border-bottom-width:2px;border-radius:5px;padding:1px 7px;color:var(--soft);background:rgba(0,0,0,.2)}
+
+  .back{transform:rotateY(180deg)}
+  .clabel{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;font-weight:600}
+  .capital{font-family:'Fraunces',serif;font-size:clamp(26px,6vw,40px);font-weight:900;line-height:1.1}
+  .note{margin-top:20px;max-width:440px;font-size:12.5px;line-height:1.55;color:var(--soft);
+    border-top:1px solid var(--line);padding-top:15px}
+  .hear{margin-top:22px;display:inline-flex;align-items:center;gap:8px;background:rgba(232,176,75,.08);
+    color:var(--gold-bright);border:1px solid var(--line-2);font:inherit;font-weight:600;font-size:13px;
+    padding:9px 17px;border-radius:999px;cursor:pointer;transition:.18s}
+  .hear:hover{border-color:var(--gold);background:rgba(232,176,75,.16)}
+  .hear:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  .nav{display:flex;align-items:center;gap:10px;margin-top:22px}
+  .nav button{flex:1;font:inherit;font-weight:600;font-size:14px;background:var(--card);
+    border:1px solid var(--line-2);border-radius:12px;padding:14px;cursor:pointer;color:var(--ink);transition:.18s}
+  .nav button:hover:not(:disabled){border-color:var(--gold);background:var(--card-2)}
+  .nav button:disabled{color:var(--faint);cursor:default;opacity:.5}
+  .nav button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .nav .mid{flex:1.3}
+
+  .bar{height:4px;background:var(--line);border-radius:999px;overflow:hidden;margin:20px 2px 0}
+  .bar i{display:block;height:100%;width:0;transition:width .4s cubic-bezier(.2,.8,.2,1);
+    background:linear-gradient(90deg,var(--gold-deep),var(--gold-bright))}
+
+  /* ---------- QUIZ ---------- */
+  .quiz{background:linear-gradient(165deg,var(--card-2),var(--card));border:1px solid var(--line-2);
+    border-radius:var(--r);padding:34px 26px;box-shadow:0 30px 60px -30px rgba(0,0,0,.7)}
+  .qflag{font-size:46px;text-align:center;line-height:1;margin-bottom:10px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+  .qp{text-align:center;color:var(--gold);font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:600}
+  .qc{text-align:center;font-family:'Fraunces',serif;font-size:clamp(26px,6vw,40px);font-weight:900;margin:8px 0 4px;line-height:1.05}
+  .qsay{text-align:center;font-size:13.5px;color:var(--soft);font-style:italic;font-family:'Fraunces',serif;margin-bottom:26px}
+  .opts{display:grid;gap:11px}
+  .opt{font:inherit;font-size:15px;font-weight:500;text-align:left;background:var(--card);
+    border:1px solid var(--line-2);border-radius:13px;padding:16px 18px;cursor:pointer;color:var(--ink);
+    transition:.14s;display:flex;align-items:center;gap:14px}
+  .opt:hover:not(:disabled){border-color:var(--gold);background:var(--card-2);transform:translateX(3px)}
+  .opt:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .opt .k{font-size:12px;color:var(--faint);border:1px solid var(--line-2);border-radius:7px;
+    width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex:none;font-weight:600}
+  .opt.correct{border-color:var(--aurora);background:rgba(90,214,176,.14)}
+  .opt.correct .k{border-color:var(--aurora);color:var(--aurora)}
+  .opt.wrong{border-color:var(--rose);background:rgba(242,120,154,.14)}
+  .opt.wrong .k{border-color:var(--rose);color:var(--rose)}
+  .opt:disabled{cursor:default}
+  .fb{min-height:24px;text-align:center;margin-top:20px;font-size:14.5px;font-weight:600}
+  .fb .ph{font-weight:400;font-style:italic;color:var(--soft);font-family:'Fraunces',serif}
+  .qnextwrap{display:flex;justify-content:center;margin-top:16px}
+  .qnext{font:inherit;font-weight:600;font-size:14px;
+    background:linear-gradient(135deg,var(--gold-bright),var(--gold));color:#1A1206;
+    border:none;border-radius:12px;padding:13px 32px;cursor:pointer;
+    box-shadow:0 8px 22px -8px rgba(232,176,75,.6)}
+  .qnext:hover{transform:translateY(-1px)}
+  .qnext:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .chips{display:flex;gap:18px;justify-content:center;margin-top:20px;font-size:12.5px;color:var(--faint)}
+  .chips b{font-weight:700}
+  .chips .g b{color:var(--aurora)}
+  .chips .w b{color:var(--rose)}
+
+  .done{text-align:center;padding:50px 18px;
+    background:linear-gradient(165deg,var(--card-2),var(--card));border:1px solid var(--line-2);
+    border-radius:var(--r);box-shadow:0 30px 60px -30px rgba(0,0,0,.7)}
+  .done .score{font-family:'Fraunces',serif;font-size:clamp(56px,16vw,96px);font-weight:900;line-height:1;
+    background:linear-gradient(135deg,var(--gold-deep),var(--gold-bright),#FFF6E2);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  .done .meta{color:var(--soft);margin:6px 0 6px;font-size:14.5px}
+  .done .best{color:var(--faint);font-size:12.5px;margin:0 0 26px}
+  .done .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .done button{font:inherit;font-weight:600;font-size:14px;border-radius:12px;padding:13px 24px;cursor:pointer;
+    border:1px solid var(--line-2);background:var(--card);color:var(--ink);transition:.18s}
+  .done button:hover{border-color:var(--gold);background:var(--card-2)}
+  .done button.key{background:linear-gradient(135deg,var(--gold-bright),var(--gold));color:#1A1206;border:none}
+  .done button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  /* ---------- BROWSE ---------- */
+  .list{margin-top:4px}
+  .group{margin-top:26px}
+  .group:first-child{margin-top:8px}
+  .group h3{font-family:'Fraunces',serif;font-size:15px;font-weight:900;color:var(--gold);
+    margin:0 0 4px;padding-bottom:7px;border-bottom:1px solid var(--line);letter-spacing:.02em}
+  .row-item{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+    padding:13px 4px;border-bottom:1px solid var(--line);animation:fadeup .5s both}
+  @keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .row-item .l{flex:1 1 auto;min-width:0}
+  .row-item .cn{font-size:15px;font-weight:600;color:var(--ink);display:flex;align-items:flex-start;gap:9px;line-height:1.25}
+  .row-item .cn .fl{font-size:18px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4));flex:none}
+  .row-item .cp{font-size:12px;color:var(--faint);font-style:italic;margin-top:2px;font-family:'Fraunces',serif;overflow-wrap:anywhere}
+  .row-item .rt{text-align:right;flex:0 1 auto;min-width:0;max-width:50%}
+  .row-item .ca{font-family:'Fraunces',serif;font-size:15.5px;font-weight:600;color:var(--gold-bright);overflow-wrap:anywhere}
+  .row-item .pp{font-size:12px;color:var(--faint);font-style:italic;margin-top:2px;font-family:'Fraunces',serif;overflow-wrap:anywhere}
+  .row-item .sp{appearance:none;background:none;border:none;cursor:pointer;color:var(--faint);
+    padding:2px 4px;font-size:13px;border-radius:6px;transition:.15s;vertical-align:middle;margin-left:4px}
+  .row-item .sp:hover{color:var(--gold)}
+  .empty{color:var(--faint);text-align:center;padding:50px;font-size:14px}
+
+  .foot{max-width:var(--maxw);margin:44px auto 0;padding:18px 20px 0;
+    font-size:12px;line-height:1.65;color:var(--soft);border-top:1px solid var(--line)}
+  .foot b{color:var(--ink)}
+  .foot .made{margin-top:14px;color:var(--faint);font-size:11.5px;letter-spacing:.04em}
+
+  /* ======================================================
+     STAGE MODE — audience display
+     ====================================================== */
+  .stage-exit{position:fixed;top:18px;right:18px;z-index:60;display:none;
+    background:rgba(20,26,42,.8);backdrop-filter:blur(8px);border:1px solid var(--line-2);
+    color:var(--ink);font:inherit;font-weight:600;font-size:13px;padding:10px 18px;border-radius:999px;cursor:pointer}
+  .stage-exit:hover{border-color:var(--gold)}
+  body.stage .hero,body.stage .tool-head,body.stage .count,body.stage .foot,body.stage .bar{display:none!important}
+  body.stage .stage-exit{display:inline-flex}
+  body.stage .tool{padding-top:0}
+  body.stage #app{max-width:1100px}
+  body.stage .card{min-height:74svh}
+  body.stage .flag{font-size:clamp(72px,13vw,150px);margin-bottom:26px}
+  body.stage .country{font-size:clamp(44px,10vw,104px)}
+  body.stage .capital{font-size:clamp(38px,8vw,84px)}
+  body.stage .say{font-size:clamp(18px,3vw,30px)}
+  body.stage .clabel{font-size:clamp(13px,1.6vw,18px)}
+  body.stage .nav{max-width:620px;margin-left:auto;margin-right:auto;margin-top:30px}
+  body.stage .hint{font-size:14px}
+
+  /* ====================================================== */
+  @media (max-width:560px){
+    .seg button{padding:9px 15px}
+    .marquee-track{font-size:26px;gap:24px}
+  }
+  @media (max-width:430px){
+    .hero{padding:72px 18px 52px}
+    .hero-eyebrow{font-size:10px;letter-spacing:.18em;margin-bottom:22px}
+    .hero-eyebrow::before,.hero-eyebrow::after{width:16px}
+    .cta-row{gap:10px;width:100%}
+    .btn{padding:14px 20px;font-size:14px;flex:1 1 auto;justify-content:center}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .card{transition:none}
+    .stars,.marquee-track,.hero h1 .num,.scrollcue span,.row-item{animation:none}
+    .hero h1 .num{-webkit-text-fill-color:var(--gold-bright)}
+  }
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<div class="stars" aria-hidden="true"></div>
+
+<!-- ============================== HERO ============================== -->
+<header class="hero">
+  <span class="hero-eyebrow">A world tour, from memory</span>
+  <h1>
+    <span class="num" id="counter">195</span>
+    <span class="mem">capitals, recited.</span>
+  </h1>
+  <p class="hero-sub">Every sovereign capital on Earth &mdash; the <b>193 UN member states</b> plus Vatican City and Palestine. Browse them, flip them, quiz yourself, and hear the hard ones spoken aloud.</p>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" id="flagTrack"></div>
+  </div>
+
+  <div class="cta-row">
+    <a href="#tool" class="btn btn-gold" id="startBtn">Start practicing
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <button class="btn btn-ghost" id="stageBtn">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4.5A1.5 1.5 0 013.5 3h9A1.5 1.5 0 0114 4.5v6A1.5 1.5 0 0112.5 12h-9A1.5 1.5 0 012 10.5v-6zM6 14h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Stage mode
+    </button>
+  </div>
+
+  <div class="scrollcue"><span>Scroll</span><span>&darr;</span></div>
+</header>
+
+<!-- ============================== TOOL ============================== -->
+<main class="tool" id="tool">
+  <div class="tool-head">
+    <div class="wrap">
+      <div class="seg" role="tablist" aria-label="Choose a mode">
+        <button id="t-list" role="tab" aria-selected="true">Browse</button>
+        <button id="t-cards" role="tab" aria-selected="false">Flashcards</button>
+        <button id="t-quiz" role="tab" aria-selected="false">Quiz</button>
+      </div>
+      <div class="toolbar">
+        <div class="field">
+          <label for="region">Continent</label>
+          <select id="region" aria-label="Filter by continent"></select>
+        </div>
+        <div class="field" id="searchField">
+          <label for="search">Find</label>
+          <input type="search" id="search" placeholder="country or capital">
+        </div>
+        <div class="field" id="voiceField" style="display:none">
+          <label for="voice">Voice</label>
+          <select id="voice" aria-label="Pronunciation voice"></select>
+        </div>
+        <button class="linkbtn" id="shuffle" style="display:none">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 3h3l6 8h3M10 1l3 2-3 2M1 11h3l2-2.5M9.5 5.5L10 5l3-2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Shuffle
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="count" id="count"></div>
+  <div id="app"></div>
+  <div class="foot" id="foot"></div>
+</main>
+
+<button class="stage-exit" id="stageExit">Exit stage mode &nbsp;·&nbsp; Esc</button>
+
+<script>
+/* =========================================================
+   DATA  ·  c=country, cp=country say, cap=capital, p=capital say
+   r=continent, f=flag, n=note.  Current to June 2026.
+   Respellings: CAPS = stressed syllable (English approximation).
+   195 sovereign capitals: 193 UN members + Vatican City + Palestine.
+   ========================================================= */
+const DATA=[
+/* AFRICA */
+{c:"Algeria",cp:"al-JEER-ee-uh",cap:"Algiers",p:"al-JEERZ",r:"Africa",f:"🇩🇿"},
+{c:"Angola",cp:"ang-GOH-lah",cap:"Luanda",p:"loo-AN-da",r:"Africa",f:"🇦🇴"},
+{c:"Benin",cp:"beh-NEEN",cap:"Porto-Novo",p:"POR-toh NOH-voh",r:"Africa",f:"🇧🇯",n:"Official capital; Cotonou is the seat of government."},
+{c:"Botswana",cp:"bot-SWAH-nah",cap:"Gaborone",p:"gab-uh-ROH-nay",r:"Africa",f:"🇧🇼"},
+{c:"Burkina Faso",cp:"bur-KEE-nah FAH-soh",cap:"Ouagadougou",p:"WAH-gah-DOO-goo",r:"Africa",f:"🇧🇫"},
+{c:"Burundi",cp:"buh-ROON-dee",cap:"Gitega",p:"gih-TEH-gah",r:"Africa",f:"🇧🇮",n:"Political capital since 2019; Bujumbura is the economic capital."},
+{c:"Cabo Verde",cp:"KAH-boh VAIR-day",cap:"Praia",p:"PRY-uh",r:"Africa",f:"🇨🇻"},
+{c:"Cameroon",cp:"kam-uh-ROON",cap:"Yaoundé",p:"yah-oon-DAY",r:"Africa",f:"🇨🇲"},
+{c:"Central African Republic",cp:"SEN-trul AF-rih-kun",cap:"Bangui",p:"bahn-GEE",r:"Africa",f:"🇨🇫"},
+{c:"Chad",cp:"CHAD",cap:"N'Djamena",p:"en-jah-MAY-nah",r:"Africa",f:"🇹🇩"},
+{c:"Comoros",cp:"KOM-uh-rohz",cap:"Moroni",p:"muh-ROH-nee",r:"Africa",f:"🇰🇲"},
+{c:"Congo (Republic)",cp:"KONG-goh",cap:"Brazzaville",p:"BRAZ-uh-vil",r:"Africa",f:"🇨🇬"},
+{c:"Congo (Dem. Rep.)",cp:"KONG-goh",cap:"Kinshasa",p:"kin-SHAH-sah",r:"Africa",f:"🇨🇩"},
+{c:"Côte d'Ivoire",cp:"koht dee-VWAR",cap:"Yamoussoukro",p:"yah-moo-SOO-kroh",r:"Africa",f:"🇨🇮",n:"Official capital; Abidjan is the economic hub."},
+{c:"Djibouti",cp:"jih-BOO-tee",cap:"Djibouti",p:"jih-BOO-tee",r:"Africa",f:"🇩🇯"},
+{c:"Egypt",cp:"EE-jipt",cap:"Cairo",p:"KY-roh",r:"Africa",f:"🇪🇬",n:"Official capital. The 'New Administrative Capital' east of Cairo now hosts the government's seat."},
+{c:"Equatorial Guinea",cp:"ek-wuh-TOR-ee-ul GIH-nee",cap:"Malabo",p:"mah-LAH-boh",r:"Africa",f:"🇬🇶"},
+{c:"Eritrea",cp:"air-ih-TREE-uh",cap:"Asmara",p:"az-MAR-ah",r:"Africa",f:"🇪🇷"},
+{c:"Eswatini",cp:"es-wah-TEE-nee",cap:"Mbabane",p:"em-bah-BAH-nay",r:"Africa",f:"🇸🇿",n:"Administrative capital; Lobamba is the royal and legislative capital."},
+{c:"Ethiopia",cp:"ee-thee-OH-pee-uh",cap:"Addis Ababa",p:"AD-iss AB-uh-buh",r:"Africa",f:"🇪🇹"},
+{c:"Gabon",cp:"gah-BOHN",cap:"Libreville",p:"LEE-bruh-vil",r:"Africa",f:"🇬🇦"},
+{c:"Gambia",cp:"GAM-bee-uh",cap:"Banjul",p:"BAN-jool",r:"Africa",f:"🇬🇲"},
+{c:"Ghana",cp:"GAH-nah",cap:"Accra",p:"uh-KRAH",r:"Africa",f:"🇬🇭"},
+{c:"Guinea",cp:"GIH-nee",cap:"Conakry",p:"KON-uh-kree",r:"Africa",f:"🇬🇳"},
+{c:"Guinea-Bissau",cp:"GIH-nee bih-SOW",cap:"Bissau",p:"bih-SOW",r:"Africa",f:"🇬🇼"},
+{c:"Kenya",cp:"KEN-yah",cap:"Nairobi",p:"ny-ROH-bee",r:"Africa",f:"🇰🇪"},
+{c:"Lesotho",cp:"luh-SOO-too",cap:"Maseru",p:"MA-seh-roo",r:"Africa",f:"🇱🇸"},
+{c:"Liberia",cp:"ly-BEER-ee-uh",cap:"Monrovia",p:"mun-ROH-vee-uh",r:"Africa",f:"🇱🇷"},
+{c:"Libya",cp:"LIH-bee-uh",cap:"Tripoli",p:"TRIP-uh-lee",r:"Africa",f:"🇱🇾"},
+{c:"Madagascar",cp:"mad-uh-GAS-kar",cap:"Antananarivo",p:"an-tah-NAH-nah-REE-voh",r:"Africa",f:"🇲🇬"},
+{c:"Malawi",cp:"mah-LAH-wee",cap:"Lilongwe",p:"lih-LONG-way",r:"Africa",f:"🇲🇼"},
+{c:"Mali",cp:"MAH-lee",cap:"Bamako",p:"BAH-mah-koh",r:"Africa",f:"🇲🇱"},
+{c:"Mauritania",cp:"mor-ih-TAY-nee-uh",cap:"Nouakchott",p:"nwahk-SHOT",r:"Africa",f:"🇲🇷"},
+{c:"Mauritius",cp:"muh-RISH-us",cap:"Port Louis",p:"port LOO-iss",r:"Africa",f:"🇲🇺"},
+{c:"Morocco",cp:"muh-ROK-oh",cap:"Rabat",p:"rah-BAHT",r:"Africa",f:"🇲🇦"},
+{c:"Mozambique",cp:"moh-zam-BEEK",cap:"Maputo",p:"mah-POO-toh",r:"Africa",f:"🇲🇿"},
+{c:"Namibia",cp:"nuh-MIH-bee-uh",cap:"Windhoek",p:"VINT-hook",r:"Africa",f:"🇳🇦"},
+{c:"Niger",cp:"NY-jur",cap:"Niamey",p:"nee-AH-may",r:"Africa",f:"🇳🇪"},
+{c:"Nigeria",cp:"ny-JEER-ee-uh",cap:"Abuja",p:"uh-BOO-jah",r:"Africa",f:"🇳🇬",n:"Capital since 1991; Lagos is the largest city."},
+{c:"Rwanda",cp:"roo-AHN-dah",cap:"Kigali",p:"kih-GAH-lee",r:"Africa",f:"🇷🇼"},
+{c:"São Tomé and Príncipe",cp:"sow toh-MEH and PRIN-sih-puh",cap:"São Tomé",p:"sow toh-MEH",r:"Africa",f:"🇸🇹"},
+{c:"Senegal",cp:"sen-ih-GAWL",cap:"Dakar",p:"dah-KAR",r:"Africa",f:"🇸🇳"},
+{c:"Seychelles",cp:"say-SHELZ",cap:"Victoria",p:"vik-TOR-ee-uh",r:"Africa",f:"🇸🇨"},
+{c:"Sierra Leone",cp:"see-AIR-uh lee-OHN",cap:"Freetown",p:"FREE-town",r:"Africa",f:"🇸🇱"},
+{c:"Somalia",cp:"soh-MAH-lee-uh",cap:"Mogadishu",p:"moh-gah-DEE-shoo",r:"Africa",f:"🇸🇴"},
+{c:"South Africa",cp:"south AF-rih-kuh",cap:"Pretoria",p:"pruh-TOR-ee-uh",r:"Africa",f:"🇿🇦",n:"Three capitals: Pretoria (executive), Bloemfontein (judicial), Cape Town (legislative)."},
+{c:"South Sudan",cp:"south soo-DAN",cap:"Juba",p:"JOO-bah",r:"Africa",f:"🇸🇸"},
+{c:"Sudan",cp:"soo-DAN",cap:"Khartoum",p:"kar-TOOM",r:"Africa",f:"🇸🇩"},
+{c:"Tanzania",cp:"tan-zuh-NEE-uh",cap:"Dodoma",p:"doh-DOH-mah",r:"Africa",f:"🇹🇿",n:"Official capital since 1996; Dar es Salaam is the largest city."},
+{c:"Togo",cp:"TOH-goh",cap:"Lomé",p:"loh-MAY",r:"Africa",f:"🇹🇬"},
+{c:"Tunisia",cp:"too-NEE-zhuh",cap:"Tunis",p:"TOO-niss",r:"Africa",f:"🇹🇳"},
+{c:"Uganda",cp:"yoo-GAN-dah",cap:"Kampala",p:"kam-PAH-lah",r:"Africa",f:"🇺🇬"},
+{c:"Zambia",cp:"ZAM-bee-uh",cap:"Lusaka",p:"loo-SAH-kah",r:"Africa",f:"🇿🇲"},
+{c:"Zimbabwe",cp:"zim-BAHB-way",cap:"Harare",p:"hah-RAR-ay",r:"Africa",f:"🇿🇼"},
+/* ASIA / MIDDLE EAST */
+{c:"Afghanistan",cp:"af-GAN-ih-stan",cap:"Kabul",p:"KAH-bool",r:"Asia",f:"🇦🇫"},
+{c:"Armenia",cp:"ar-MEE-nee-uh",cap:"Yerevan",p:"yeh-reh-VAHN",r:"Asia",f:"🇦🇲"},
+{c:"Azerbaijan",cp:"az-ur-by-JAHN",cap:"Baku",p:"bah-KOO",r:"Asia",f:"🇦🇿"},
+{c:"Bahrain",cp:"bah-RAYN",cap:"Manama",p:"mah-NAH-mah",r:"Asia",f:"🇧🇭"},
+{c:"Bangladesh",cp:"BAHNG-luh-desh",cap:"Dhaka",p:"DAH-kah",r:"Asia",f:"🇧🇩"},
+{c:"Bhutan",cp:"boo-TAHN",cap:"Thimphu",p:"THIM-poo",r:"Asia",f:"🇧🇹"},
+{c:"Brunei",cp:"broo-NY",cap:"Bandar Seri Begawan",p:"BAN-dar SEH-ree buh-GAH-wahn",r:"Asia",f:"🇧🇳"},
+{c:"Cambodia",cp:"kam-BOH-dee-uh",cap:"Phnom Penh",p:"puh-NOM PEN",r:"Asia",f:"🇰🇭"},
+{c:"China",cp:"CHY-nah",cap:"Beijing",p:"bay-JING",r:"Asia",f:"🇨🇳"},
+{c:"Cyprus",cp:"SY-prus",cap:"Nicosia",p:"nik-uh-SEE-uh",r:"Asia",f:"🇨🇾"},
+{c:"Georgia",cp:"JOR-juh",cap:"Tbilisi",p:"tuh-bih-LEE-see",r:"Asia",f:"🇬🇪"},
+{c:"India",cp:"IN-dee-uh",cap:"New Delhi",p:"new DEL-ee",r:"Asia",f:"🇮🇳"},
+{c:"Indonesia",cp:"in-duh-NEE-zhuh",cap:"Jakarta",p:"juh-KAR-tuh",r:"Asia",f:"🇮🇩",n:"Legal capital today. Nusantara (Borneo) is being built as the future political capital, targeted around 2028."},
+{c:"Iran",cp:"ih-RAHN",cap:"Tehran",p:"teh-RAHN",r:"Asia",f:"🇮🇷"},
+{c:"Iraq",cp:"ih-RAHK",cap:"Baghdad",p:"BAG-dad",r:"Asia",f:"🇮🇶"},
+{c:"Israel",cp:"IZ-ree-ul",cap:"Jerusalem",p:"juh-ROO-suh-lem",r:"Asia",f:"🇮🇱",n:"Declared capital; status is internationally disputed and most embassies are in Tel Aviv."},
+{c:"Japan",cp:"juh-PAN",cap:"Tokyo",p:"TOH-kee-oh",r:"Asia",f:"🇯🇵"},
+{c:"Jordan",cp:"JOR-dun",cap:"Amman",p:"ah-MAHN",r:"Asia",f:"🇯🇴"},
+{c:"Kazakhstan",cp:"kah-zak-STAHN",cap:"Astana",p:"ah-stah-NAH",r:"Asia",f:"🇰🇿",n:"Renamed Nur-Sultan in 2019, then changed back to Astana in 2022."},
+{c:"Kuwait",cp:"koo-WAYT",cap:"Kuwait City",p:"koo-WAYT SIH-tee",r:"Asia",f:"🇰🇼"},
+{c:"Kyrgyzstan",cp:"KEER-gih-stan",cap:"Bishkek",p:"bish-KEK",r:"Asia",f:"🇰🇬"},
+{c:"Laos",cp:"LAH-ohss",cap:"Vientiane",p:"vyen-TYAHN",r:"Asia",f:"🇱🇦"},
+{c:"Lebanon",cp:"LEB-uh-nun",cap:"Beirut",p:"bay-ROOT",r:"Asia",f:"🇱🇧"},
+{c:"Malaysia",cp:"muh-LAY-zhuh",cap:"Kuala Lumpur",p:"KWAH-lah LOOM-poor",r:"Asia",f:"🇲🇾",n:"Capital; Putrajaya is the administrative centre."},
+{c:"Maldives",cp:"MAWL-deevz",cap:"Malé",p:"MAH-lay",r:"Asia",f:"🇲🇻"},
+{c:"Mongolia",cp:"mong-GOH-lee-uh",cap:"Ulaanbaatar",p:"oo-lahn-BAH-tar",r:"Asia",f:"🇲🇳"},
+{c:"Myanmar",cp:"MYAN-mar",cap:"Naypyidaw",p:"NAY-pee-daw",r:"Asia",f:"🇲🇲",n:"Capital since 2006; Yangon (Rangoon) is the largest city."},
+{c:"Nepal",cp:"nuh-PAWL",cap:"Kathmandu",p:"kat-man-DOO",r:"Asia",f:"🇳🇵"},
+{c:"North Korea",cp:"north kuh-REE-uh",cap:"Pyongyang",p:"pyong-YANG",r:"Asia",f:"🇰🇵"},
+{c:"Oman",cp:"oh-MAHN",cap:"Muscat",p:"MUSS-kat",r:"Asia",f:"🇴🇲"},
+{c:"Pakistan",cp:"PAK-ih-stan",cap:"Islamabad",p:"iss-LAH-mah-bahd",r:"Asia",f:"🇵🇰"},
+{c:"Philippines",cp:"FIL-ih-peenz",cap:"Manila",p:"muh-NIL-uh",r:"Asia",f:"🇵🇭"},
+{c:"Qatar",cp:"KAH-tar",cap:"Doha",p:"DOH-hah",r:"Asia",f:"🇶🇦"},
+{c:"Saudi Arabia",cp:"SOW-dee uh-RAY-bee-uh",cap:"Riyadh",p:"ree-YAHD",r:"Asia",f:"🇸🇦"},
+{c:"Singapore",cp:"SING-uh-por",cap:"Singapore",p:"SING-uh-por",r:"Asia",f:"🇸🇬"},
+{c:"South Korea",cp:"south kuh-REE-uh",cap:"Seoul",p:"SOHL",r:"Asia",f:"🇰🇷"},
+{c:"Sri Lanka",cp:"shree LAHNG-kuh",cap:"Sri Jayawardenepura Kotte",p:"shree JY-uh-war-duh-nuh-POO-ruh KOT-tay",r:"Asia",f:"🇱🇰",n:"Official and legislative capital; Colombo is the commercial capital."},
+{c:"Syria",cp:"SEER-ee-uh",cap:"Damascus",p:"duh-MASS-kuss",r:"Asia",f:"🇸🇾"},
+{c:"Tajikistan",cp:"tah-JIH-kih-stan",cap:"Dushanbe",p:"doo-SHAN-beh",r:"Asia",f:"🇹🇯"},
+{c:"Thailand",cp:"TY-land",cap:"Bangkok",p:"BANG-kok",r:"Asia",f:"🇹🇭"},
+{c:"Timor-Leste",cp:"TEE-mor LESS-tay",cap:"Dili",p:"DEE-lee",r:"Asia",f:"🇹🇱"},
+{c:"Turkey (Türkiye)",cp:"TUR-kee",cap:"Ankara",p:"ANG-kuh-ruh",r:"Asia",f:"🇹🇷",n:"Istanbul is larger, but Ankara is the capital."},
+{c:"Turkmenistan",cp:"turk-MEN-ih-stan",cap:"Ashgabat",p:"ASH-gah-baht",r:"Asia",f:"🇹🇲"},
+{c:"United Arab Emirates",cp:"yoo-NY-ted AIR-ub EM-ur-uts",cap:"Abu Dhabi",p:"AH-boo DAH-bee",r:"Asia",f:"🇦🇪",n:"Capital; Dubai is the largest city."},
+{c:"Uzbekistan",cp:"ooz-BEK-ih-stan",cap:"Tashkent",p:"tash-KENT",r:"Asia",f:"🇺🇿"},
+{c:"Vietnam",cp:"vee-et-NAHM",cap:"Hanoi",p:"ha-NOY",r:"Asia",f:"🇻🇳"},
+{c:"Yemen",cp:"YEM-un",cap:"Sanaa",p:"sah-NAH",r:"Asia",f:"🇾🇪",n:"Recognized capital; Aden has served as a temporary seat during conflict."},
+{c:"Palestine",cp:"PAL-uh-styne",cap:"East Jerusalem (claimed)",p:"juh-ROO-suh-lem",r:"Asia",f:"🇵🇸",n:"UN observer state. Claims East Jerusalem; Ramallah is the de facto administrative seat."},
+/* EUROPE */
+{c:"Albania",cp:"al-BAY-nee-uh",cap:"Tirana",p:"tih-RAH-nah",r:"Europe",f:"🇦🇱"},
+{c:"Andorra",cp:"an-DOR-uh",cap:"Andorra la Vella",p:"an-DOR-uh lah VEL-yah",r:"Europe",f:"🇦🇩"},
+{c:"Austria",cp:"AW-stree-uh",cap:"Vienna",p:"vee-EN-uh",r:"Europe",f:"🇦🇹"},
+{c:"Belarus",cp:"bel-uh-ROOS",cap:"Minsk",p:"MINSK",r:"Europe",f:"🇧🇾"},
+{c:"Belgium",cp:"BEL-jum",cap:"Brussels",p:"BRUSS-uls",r:"Europe",f:"🇧🇪"},
+{c:"Bosnia and Herzegovina",cp:"BOZ-nee-uh, hert-suh-goh-VEE-nuh",cap:"Sarajevo",p:"sah-rah-YAY-voh",r:"Europe",f:"🇧🇦"},
+{c:"Bulgaria",cp:"bul-GAIR-ee-uh",cap:"Sofia",p:"SOH-fee-uh",r:"Europe",f:"🇧🇬"},
+{c:"Croatia",cp:"kroh-AY-shuh",cap:"Zagreb",p:"ZAH-greb",r:"Europe",f:"🇭🇷"},
+{c:"Czechia",cp:"CHEK-ee-uh",cap:"Prague",p:"PRAHG",r:"Europe",f:"🇨🇿"},
+{c:"Denmark",cp:"DEN-mark",cap:"Copenhagen",p:"koh-pen-HAY-gen",r:"Europe",f:"🇩🇰"},
+{c:"Estonia",cp:"eh-STOH-nee-uh",cap:"Tallinn",p:"TAH-lin",r:"Europe",f:"🇪🇪"},
+{c:"Finland",cp:"FIN-lund",cap:"Helsinki",p:"HEL-sing-kee",r:"Europe",f:"🇫🇮"},
+{c:"France",cp:"FRANSS",cap:"Paris",p:"PA-riss",r:"Europe",f:"🇫🇷"},
+{c:"Germany",cp:"JUR-muh-nee",cap:"Berlin",p:"ber-LIN",r:"Europe",f:"🇩🇪"},
+{c:"Greece",cp:"GREESS",cap:"Athens",p:"ATH-enz",r:"Europe",f:"🇬🇷"},
+{c:"Hungary",cp:"HUNG-guh-ree",cap:"Budapest",p:"BOO-duh-pest",r:"Europe",f:"🇭🇺"},
+{c:"Iceland",cp:"EYESS-lund",cap:"Reykjavík",p:"RAYK-yah-vik",r:"Europe",f:"🇮🇸"},
+{c:"Ireland",cp:"EYER-lund",cap:"Dublin",p:"DUB-lin",r:"Europe",f:"🇮🇪"},
+{c:"Italy",cp:"IH-tuh-lee",cap:"Rome",p:"ROHM",r:"Europe",f:"🇮🇹"},
+{c:"Latvia",cp:"LAT-vee-uh",cap:"Riga",p:"REE-gah",r:"Europe",f:"🇱🇻"},
+{c:"Liechtenstein",cp:"LIK-tun-styne",cap:"Vaduz",p:"vah-DOOTS",r:"Europe",f:"🇱🇮"},
+{c:"Lithuania",cp:"lith-oo-AY-nee-uh",cap:"Vilnius",p:"VIL-nee-us",r:"Europe",f:"🇱🇹"},
+{c:"Luxembourg",cp:"LUK-sum-burg",cap:"Luxembourg",p:"LUK-sem-burg",r:"Europe",f:"🇱🇺"},
+{c:"Malta",cp:"MAWL-tuh",cap:"Valletta",p:"vah-LET-tah",r:"Europe",f:"🇲🇹"},
+{c:"Moldova",cp:"mol-DOH-vuh",cap:"Chișinău",p:"kee-shee-NOW",r:"Europe",f:"🇲🇩"},
+{c:"Monaco",cp:"MON-uh-koh",cap:"Monaco",p:"MON-uh-koh",r:"Europe",f:"🇲🇨"},
+{c:"Montenegro",cp:"mon-tuh-NEE-groh",cap:"Podgorica",p:"POD-gor-eet-sah",r:"Europe",f:"🇲🇪"},
+{c:"Netherlands",cp:"NETH-ur-lundz",cap:"Amsterdam",p:"AM-ster-dam",r:"Europe",f:"🇳🇱",n:"Constitutional capital; the government and courts sit in The Hague."},
+{c:"North Macedonia",cp:"north mass-uh-DOH-nee-uh",cap:"Skopje",p:"SKOP-yeh",r:"Europe",f:"🇲🇰"},
+{c:"Norway",cp:"NOR-way",cap:"Oslo",p:"OZ-loh",r:"Europe",f:"🇳🇴"},
+{c:"Poland",cp:"POH-lund",cap:"Warsaw",p:"WAR-saw",r:"Europe",f:"🇵🇱"},
+{c:"Portugal",cp:"POR-chuh-gul",cap:"Lisbon",p:"LIZ-bun",r:"Europe",f:"🇵🇹"},
+{c:"Romania",cp:"roh-MAY-nee-uh",cap:"Bucharest",p:"BOO-kuh-rest",r:"Europe",f:"🇷🇴"},
+{c:"Russia",cp:"RUH-shuh",cap:"Moscow",p:"MOSS-koh",r:"Europe",f:"🇷🇺"},
+{c:"San Marino",cp:"san muh-REE-noh",cap:"San Marino",p:"san muh-REE-noh",r:"Europe",f:"🇸🇲"},
+{c:"Serbia",cp:"SUR-bee-uh",cap:"Belgrade",p:"BEL-grayd",r:"Europe",f:"🇷🇸"},
+{c:"Slovakia",cp:"sloh-VAH-kee-uh",cap:"Bratislava",p:"brat-ih-SLAH-vah",r:"Europe",f:"🇸🇰"},
+{c:"Slovenia",cp:"sloh-VEE-nee-uh",cap:"Ljubljana",p:"lyoo-blee-AH-nah",r:"Europe",f:"🇸🇮"},
+{c:"Spain",cp:"SPAYN",cap:"Madrid",p:"muh-DRID",r:"Europe",f:"🇪🇸"},
+{c:"Sweden",cp:"SWEE-dun",cap:"Stockholm",p:"STOK-hohm",r:"Europe",f:"🇸🇪"},
+{c:"Switzerland",cp:"SWIT-sur-lund",cap:"Bern",p:"BERN",r:"Europe",f:"🇨🇭"},
+{c:"Ukraine",cp:"yoo-KRAYN",cap:"Kyiv",p:"KEEV",r:"Europe",f:"🇺🇦"},
+{c:"United Kingdom",cp:"yoo-NY-ted KING-dum",cap:"London",p:"LUN-dun",r:"Europe",f:"🇬🇧"},
+{c:"Vatican City",cp:"VAT-ih-kun SIH-tee",cap:"Vatican City",p:"VAT-ih-kun SIH-tee",r:"Europe",f:"🇻🇦",n:"The Holy See, a UN observer rather than a member state."},
+/* NORTH AMERICA & CARIBBEAN */
+{c:"Antigua and Barbuda",cp:"an-TEE-gwuh, bar-BOO-duh",cap:"Saint John's",p:"saynt JONZ",r:"North America",f:"🇦🇬"},
+{c:"Bahamas",cp:"buh-HAH-muz",cap:"Nassau",p:"NASS-aw",r:"North America",f:"🇧🇸"},
+{c:"Barbados",cp:"bar-BAY-dohss",cap:"Bridgetown",p:"BRIJ-town",r:"North America",f:"🇧🇧"},
+{c:"Belize",cp:"buh-LEEZ",cap:"Belmopan",p:"bel-moh-PAN",r:"North America",f:"🇧🇿"},
+{c:"Canada",cp:"KAN-uh-duh",cap:"Ottawa",p:"OT-uh-wuh",r:"North America",f:"🇨🇦"},
+{c:"Costa Rica",cp:"KOH-stuh REE-kuh",cap:"San José",p:"san hoh-ZAY",r:"North America",f:"🇨🇷"},
+{c:"Cuba",cp:"KYOO-buh",cap:"Havana",p:"huh-VAN-uh",r:"North America",f:"🇨🇺"},
+{c:"Dominica",cp:"dom-ih-NEE-kuh",cap:"Roseau",p:"roh-ZOH",r:"North America",f:"🇩🇲"},
+{c:"Dominican Republic",cp:"duh-MIN-ih-kun",cap:"Santo Domingo",p:"SAN-toh doh-MING-goh",r:"North America",f:"🇩🇴"},
+{c:"El Salvador",cp:"el SAL-vuh-dor",cap:"San Salvador",p:"san SAL-vuh-dor",r:"North America",f:"🇸🇻"},
+{c:"Grenada",cp:"gruh-NAY-duh",cap:"Saint George's",p:"saynt JOR-jiz",r:"North America",f:"🇬🇩"},
+{c:"Guatemala",cp:"gwah-tuh-MAH-luh",cap:"Guatemala City",p:"gwah-tuh-MAH-lah SIH-tee",r:"North America",f:"🇬🇹"},
+{c:"Haiti",cp:"HAY-tee",cap:"Port-au-Prince",p:"port-oh-PRINS",r:"North America",f:"🇭🇹"},
+{c:"Honduras",cp:"hon-DOOR-us",cap:"Tegucigalpa",p:"teh-goo-see-GAL-pah",r:"North America",f:"🇭🇳"},
+{c:"Jamaica",cp:"juh-MAY-kuh",cap:"Kingston",p:"KING-stun",r:"North America",f:"🇯🇲"},
+{c:"Mexico",cp:"MEK-sih-koh",cap:"Mexico City",p:"MEK-sih-koh SIH-tee",r:"North America",f:"🇲🇽"},
+{c:"Nicaragua",cp:"nik-uh-RAH-gwuh",cap:"Managua",p:"mah-NAH-gwah",r:"North America",f:"🇳🇮"},
+{c:"Panama",cp:"PAN-uh-mah",cap:"Panama City",p:"PAN-uh-mah SIH-tee",r:"North America",f:"🇵🇦"},
+{c:"Saint Kitts and Nevis",cp:"saynt KITS, NEE-vis",cap:"Basseterre",p:"bahs-TAIR",r:"North America",f:"🇰🇳"},
+{c:"Saint Lucia",cp:"saynt LOO-shuh",cap:"Castries",p:"kas-TREE",r:"North America",f:"🇱🇨"},
+{c:"Saint Vincent & the Grenadines",cp:"saynt VIN-sunt, gren-uh-DEENZ",cap:"Kingstown",p:"KING-stown",r:"North America",f:"🇻🇨"},
+{c:"Trinidad and Tobago",cp:"TRIN-ih-dad, tuh-BAY-goh",cap:"Port of Spain",p:"port uv SPAYN",r:"North America",f:"🇹🇹"},
+{c:"United States",cp:"yoo-NY-ted STAYTS",cap:"Washington, D.C.",p:"WASH-ing-tun DEE-SEE",r:"North America",f:"🇺🇸"},
+/* SOUTH AMERICA */
+{c:"Argentina",cp:"ar-jun-TEE-nuh",cap:"Buenos Aires",p:"BWAY-nuss AIR-eez",r:"South America",f:"🇦🇷"},
+{c:"Bolivia",cp:"buh-LIH-vee-uh",cap:"Sucre",p:"SOO-kray",r:"South America",f:"🇧🇴",n:"Constitutional capital; La Paz is the seat of government."},
+{c:"Brazil",cp:"bruh-ZIL",cap:"Brasília",p:"brah-ZEEL-yah",r:"South America",f:"🇧🇷"},
+{c:"Chile",cp:"CHIH-lee",cap:"Santiago",p:"san-tee-AH-goh",r:"South America",f:"🇨🇱"},
+{c:"Colombia",cp:"kuh-LOM-bee-uh",cap:"Bogotá",p:"boh-goh-TAH",r:"South America",f:"🇨🇴"},
+{c:"Ecuador",cp:"EK-wuh-dor",cap:"Quito",p:"KEE-toh",r:"South America",f:"🇪🇨"},
+{c:"Guyana",cp:"gy-AN-uh",cap:"Georgetown",p:"JORJ-town",r:"South America",f:"🇬🇾"},
+{c:"Paraguay",cp:"PAIR-uh-gwy",cap:"Asunción",p:"ah-soon-see-OHN",r:"South America",f:"🇵🇾"},
+{c:"Peru",cp:"puh-ROO",cap:"Lima",p:"LEE-mah",r:"South America",f:"🇵🇪"},
+{c:"Suriname",cp:"SOOR-ih-nahm",cap:"Paramaribo",p:"pah-rah-MAH-ree-boh",r:"South America",f:"🇸🇷"},
+{c:"Uruguay",cp:"YOOR-uh-gwy",cap:"Montevideo",p:"mon-teh-vih-DAY-oh",r:"South America",f:"🇺🇾"},
+{c:"Venezuela",cp:"ven-uh-ZWAY-luh",cap:"Caracas",p:"kah-RAH-kahs",r:"South America",f:"🇻🇪"},
+/* OCEANIA */
+{c:"Australia",cp:"aw-STRAYL-yuh",cap:"Canberra",p:"KAN-bruh",r:"Oceania",f:"🇦🇺",n:"Capital; Sydney is the largest city."},
+{c:"Fiji",cp:"FEE-jee",cap:"Suva",p:"SOO-vah",r:"Oceania",f:"🇫🇯"},
+{c:"Kiribati",cp:"kih-rih-BAHSS",cap:"South Tarawa",p:"tah-RAH-wah",r:"Oceania",f:"🇰🇮",n:"The name is pronounced 'Kiribas' (the ti sounds like an s)."},
+{c:"Marshall Islands",cp:"MAR-shul EYE-lundz",cap:"Majuro",p:"mah-JOO-roh",r:"Oceania",f:"🇲🇭"},
+{c:"Micronesia",cp:"my-kruh-NEE-zhuh",cap:"Palikir",p:"PAH-lih-keer",r:"Oceania",f:"🇫🇲"},
+{c:"Nauru",cp:"nah-OO-roo",cap:"Yaren (de facto)",p:"YAR-en",r:"Oceania",f:"🇳🇷",n:"No official capital; government offices are in Yaren district."},
+{c:"New Zealand",cp:"noo ZEE-lund",cap:"Wellington",p:"WEL-ing-tun",r:"Oceania",f:"🇳🇿",n:"Capital; Auckland is the largest city."},
+{c:"Palau",cp:"pah-LOW",cap:"Ngerulmud",p:"nger-ROOL-mood",r:"Oceania",f:"🇵🇼",n:"Capital since 2006; Koror is the largest town."},
+{c:"Papua New Guinea",cp:"PAP-yoo-uh noo GIH-nee",cap:"Port Moresby",p:"port MORZ-bee",r:"Oceania",f:"🇵🇬"},
+{c:"Samoa",cp:"suh-MOH-uh",cap:"Apia",p:"ah-PEE-ah",r:"Oceania",f:"🇼🇸"},
+{c:"Solomon Islands",cp:"SOL-uh-mun EYE-lundz",cap:"Honiara",p:"hoh-nee-AR-ah",r:"Oceania",f:"🇸🇧"},
+{c:"Tonga",cp:"TONG-guh",cap:"Nuku'alofa",p:"noo-koo-ah-LOH-fah",r:"Oceania",f:"🇹🇴"},
+{c:"Tuvalu",cp:"too-VAH-loo",cap:"Funafuti",p:"foo-nah-FOO-tee",r:"Oceania",f:"🇹🇻"},
+{c:"Vanuatu",cp:"van-oo-AH-too",cap:"Port Vila",p:"port VEE-lah",r:"Oceania",f:"🇻🇺"}
+];
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const $=s=>document.querySelector(s);
+const app=$('#app');
+let tab='list';
+let region='All';
+let search='';
+let deck=[];
+let idx=0,flipped=false;
+let got=0,missed=0,missedList=[];
+
+const CONTINENTS=['All','Africa','Asia','Europe','North America','South America','Oceania'];
+
+function buildRegionSelect(){
+  $('#region').innerHTML=CONTINENTS
+    .filter(r=>r==='All'||DATA.some(d=>d.r===r))
+    .map(r=>{const n=r==='All'?DATA.length:DATA.filter(d=>d.r===r).length;return `<option value="${r}">${r} · ${n}</option>`;})
+    .join('');
+}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function filtered(){return region==='All'?DATA.slice():DATA.filter(d=>d.r===region);}
+/* quiz/flashcard deck excludes disputed/parenthetical capitals as clean answers */
+function quizable(arr){return arr.filter(d=>!d.cap.includes('('));}
+function buildDeck(doShuffle){
+  deck=filtered();
+  if(tab==='quiz')deck=quizable(deck);
+  if(doShuffle)deck=shuffle(deck);
+  idx=0;flipped=false;got=0;missed=0;missedList=[];
+}
+function clean(s){return s.replace(/\s*\(.*?\)/g,'').trim();}
+
+/* =========================================================
+   VOICE  ·  pick the most natural available voice
+   ========================================================= */
+let VOICES=[],enVoices=[],chosenVoice=null;
+const PREFERRED=[
+  'Google US English','Google UK English Female','Google UK English Male',
+  'Samantha','Karen','Serena','Daniel','Moira','Tessa',
+  'Microsoft Aria Online','Microsoft Jenny Online','Microsoft Sonia Online'
+];
+function pickPreferredVoice(){
+  enVoices=VOICES.filter(v=>/^en(-|_)/i.test(v.lang)||/^en$/i.test(v.lang));
+  const saved=localStorage.getItem('wc_voice');
+  let v=null;
+  if(saved)v=enVoices.find(x=>x.name===saved);
+  if(!v)for(const name of PREFERRED){v=enVoices.find(x=>x.name.includes(name));if(v)break;}
+  if(!v)v=enVoices.find(x=>x.lang==='en-US')||enVoices[0]||VOICES[0]||null;
+  chosenVoice=v;
+}
+function buildVoiceSelect(){
+  const sel=$('#voice');if(!sel)return;
+  if(!enVoices.length){$('#voiceField').style.display='none';return;}
+  $('#voiceField').style.display=(tab==='list'||tab==='cards')?'inline-flex':'none';
+  sel.innerHTML=enVoices.map(v=>{
+    const label=v.name.replace(/ \(.*\)$/,'')+(/GB|UK/i.test(v.lang)?' · UK':'');
+    return `<option value="${v.name}"${chosenVoice&&v.name===chosenVoice.name?' selected':''}>${label}</option>`;
+  }).join('');
+}
+function loadVoices(){
+  VOICES=window.speechSynthesis?speechSynthesis.getVoices():[];
+  if(VOICES.length){pickPreferredVoice();buildVoiceSelect();}
+}
+function speak(t){
+  if(!('speechSynthesis'in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t);
+  if(chosenVoice){u.voice=chosenVoice;u.lang=chosenVoice.lang;}
+  u.rate=.9;u.pitch=1;
+  speechSynthesis.speak(u);
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+function setTabUI(){
+  $('#t-cards').setAttribute('aria-selected',tab==='cards');
+  $('#t-quiz').setAttribute('aria-selected',tab==='quiz');
+  $('#t-list').setAttribute('aria-selected',tab==='list');
+  $('#searchField').style.display=tab==='list'?'inline-flex':'none';
+  $('#shuffle').style.display=tab==='list'?'none':'inline-flex';
+  buildVoiceSelect();
+}
+function setCount(){
+  const c=$('#count');
+  if(tab==='list'){const n=listData().length;c.innerHTML=`<b>${n}</b> ${n===1?'country':'countries'}${region==='All'?'':' in '+region}`;}
+  else c.innerHTML=`<b>${Math.min(idx+1,deck.length)}</b> of ${deck.length}${region==='All'?'':' · '+region}`;
+}
+function render(){setTabUI();setCount();if(tab==='cards')renderCards();else if(tab==='quiz')renderQuiz();else renderList();}
+
+/* ---- FLASHCARDS ---- */
+function renderCards(){
+  if(!deck.length){app.innerHTML='<div class="empty">No countries in this continent.</div>';return;}
+  const d=deck[idx];const pct=((idx+1)/deck.length)*100;
+  app.innerHTML=`
+    <div class="stagecard">
+      <div class="card ${flipped?'flipped':''}" id="card" tabindex="0" role="button" aria-label="Flashcard, activate to flip">
+        <div class="face front">
+          <span class="tl">${d.r}</span><span class="tr">${idx+1}/${deck.length}</span>
+          <div class="flag">${d.f}</div>
+          <div class="country">${d.c}</div>
+          <div class="say"><b>${d.cp}</b></div>
+          <button class="hear" id="hearC">🔊 Hear country</button>
+          <div class="hint">Tap to reveal capital · <kbd>space</kbd></div>
+        </div>
+        <div class="face back">
+          <span class="tl">${d.c}</span>
+          <div class="clabel">Capital</div>
+          <div class="capital">${d.cap}</div>
+          <div class="say"><b>${d.p}</b></div>
+          ${d.n?`<div class="note">${d.n}</div>`:''}
+          <button class="hear" id="hearCap">🔊 Hear capital</button>
+        </div>
+      </div>
+    </div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <div class="nav">
+      <button id="prev" ${idx===0?'disabled':''}>← Back</button>
+      <button id="flip" class="mid">Flip card</button>
+      <button id="next" ${idx===deck.length-1?'disabled':''}>Next →</button>
+    </div>`;
+  const card=$('#card');
+  const doFlip=()=>{flipped=!flipped;card.classList.toggle('flipped');};
+  card.addEventListener('click',e=>{if(!e.target.closest('.hear'))doFlip();});
+  card.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();doFlip();}});
+  $('#flip').addEventListener('click',doFlip);
+  $('#prev').addEventListener('click',prev);
+  $('#next').addEventListener('click',next);
+  $('#hearC').addEventListener('click',e=>{e.stopPropagation();speak(clean(d.c));});
+  $('#hearCap').addEventListener('click',e=>{e.stopPropagation();speak(clean(d.cap));});
+}
+function next(){if(idx<deck.length-1){idx++;flipped=false;render();}}
+function prev(){if(idx>0){idx--;flipped=false;render();}}
+
+/* ---- QUIZ ---- */
+function distractorPool(){return DATA.filter(d=>!d.cap.includes('('));}
+function options(correct){
+  const pool=distractorPool().filter(d=>d.cap!==correct.cap);
+  return shuffle([correct.cap,...shuffle(pool).slice(0,3).map(d=>d.cap)]);
+}
+function renderQuiz(){
+  if(!deck.length){app.innerHTML='<div class="empty">No countries in this continent.</div>';return;}
+  if(idx>=deck.length){renderDone();return;}
+  const d=deck[idx];const opts=options(d);const pct=((idx+1)/deck.length)*100;
+  app.innerHTML=`
+    <div class="quiz">
+      <div class="qflag">${d.f}</div>
+      <div class="qp">Capital of</div>
+      <div class="qc">${d.c}</div>
+      <div class="qsay">${d.cp}</div>
+      <div class="opts" id="opts">
+        ${opts.map((o,i)=>`<button class="opt" data-cap="${encodeURIComponent(o)}"><span class="k">${i+1}</span><span>${o}</span></button>`).join('')}
+      </div>
+      <div class="fb" id="fb"></div>
+      <div class="qnextwrap" id="nx"></div>
+    </div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <div class="chips"><span class="g">Correct <b>${got}</b></span><span class="w">Review <b>${missed}</b></span></div>`;
+  const bs=Array.from(document.querySelectorAll('.opt'));
+  bs.forEach(b=>b.addEventListener('click',()=>answer(b,d,bs)));
+}
+function answer(btn,d,bs){
+  const chosen=decodeURIComponent(btn.dataset.cap);
+  bs.forEach(b=>{b.disabled=true;const cap=decodeURIComponent(b.dataset.cap);if(cap===d.cap)b.classList.add('correct');else if(b===btn)b.classList.add('wrong');});
+  const fb=$('#fb');
+  if(chosen===d.cap){got++;fb.innerHTML=`Correct. <span class="ph">${d.cap} · ${d.p}</span>`;fb.style.color='var(--aurora)';}
+  else{missed++;missedList.push(d);fb.innerHTML=`It's <b>${d.cap}</b>. <span class="ph">${d.p}</span>`;fb.style.color='var(--rose)';}
+  $('#nx').innerHTML=`<button class="qnext" id="qn">Next →</button>`;
+  $('#qn').addEventListener('click',()=>{idx++;render();});
+  $('#qn').focus();
+}
+function renderDone(){
+  const total=got+missed;const score=total?Math.round(got/total*100):0;
+  let best=parseInt(localStorage.getItem('wc_best')||'0',10);
+  let isNew=false;
+  if(score>best){best=score;isNew=true;localStorage.setItem('wc_best',String(best));}
+  app.innerHTML=`
+    <div class="done">
+      <div class="score">${score}%</div>
+      <p class="meta">${got} correct · ${missed} to review · ${total} questions</p>
+      <p class="best">${isNew?'★ New personal best!':'Personal best: '+best+'%'}</p>
+      <div class="row">
+        ${missedList.length?`<button class="key" id="drill">Drill the ${missedList.length} you missed</button>`:''}
+        <button id="again">Restart deck</button>
+      </div>
+    </div>`;
+  if(missedList.length)$('#drill').addEventListener('click',()=>{deck=shuffle(missedList);idx=0;got=0;missed=0;missedList=[];render();});
+  $('#again').addEventListener('click',()=>{buildDeck(true);render();});
+}
+
+/* ---- BROWSE (alphabetical by country) ---- */
+function listData(){
+  let rows=filtered().slice().sort((a,b)=>a.c.localeCompare(b.c));
+  if(search){const q=search.toLowerCase();rows=rows.filter(d=>d.c.toLowerCase().includes(q)||d.cap.toLowerCase().includes(q));}
+  return rows;
+}
+function renderList(){
+  const rows=listData();
+  if(!rows.length){app.innerHTML='<div class="empty">Nothing matches.</div>';return;}
+  let html='<div class="list">';let letter='';let i=0;
+  rows.forEach(d=>{
+    const L=d.c[0].toUpperCase();
+    if(L!==letter){if(letter!=='')html+='</div>';letter=L;html+=`<div class="group"><h3>${L}</h3>`;}
+    const delay=Math.min(i,14)*0.018;i++;
+    html+=`
+      <div class="row-item" style="animation-delay:${delay}s">
+        <div class="l">
+          <div class="cn"><span class="fl">${d.f}</span>${d.c}</div>
+          <div class="cp">${d.cp}</div>
+        </div>
+        <div class="rt">
+          <div class="ca">${d.cap}<button class="sp" data-say="${encodeURIComponent(clean(d.cap))}" aria-label="Hear ${clean(d.cap)}" title="Hear it">🔊</button></div>
+          <div class="pp">${d.p}</div>
+        </div>
+      </div>`;
+  });
+  html+='</div></div>';
+  app.innerHTML=html;
+  app.querySelectorAll('.sp').forEach(b=>b.addEventListener('click',()=>speak(decodeURIComponent(b.dataset.say))));
+}
+
+/* =========================================================
+   STAGE MODE
+   ========================================================= */
+function enterStage(){
+  setTab('cards');
+  document.body.classList.add('stage');
+  document.getElementById('tool').scrollIntoView();
+  window.scrollTo(0,0);
+}
+function exitStage(){document.body.classList.remove('stage');}
+
+/* =========================================================
+   HERO  ·  flag marquee + counter
+   ========================================================= */
+function buildFlagMarquee(){
+  const flags=DATA.map(d=>d.f);
+  const row=flags.concat(flags).map(f=>`<span>${f}</span>`).join('');
+  const t=$('#flagTrack');if(t)t.innerHTML=row;
+}
+function animateCounter(){
+  const el=$('#counter');if(!el)return;
+  const target=DATA.length;
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent=target;return;}
+  const dur=1400;let start=null;
+  function step(ts){
+    if(start===null)start=ts;
+    const prog=Math.min((ts-start)/dur,1);
+    const eased=1-Math.pow(1-prog,3);
+    el.textContent=Math.round(eased*target);
+    if(prog<1)requestAnimationFrame(step);else el.textContent=target;
+  }
+  requestAnimationFrame(step);
+}
+
+/* =========================================================
+   WIRING
+   ========================================================= */
+function setTab(t){tab=t;if(t!=='list')buildDeck(t==='quiz');render();}
+$('#t-cards').addEventListener('click',()=>setTab('cards'));
+$('#t-quiz').addEventListener('click',()=>setTab('quiz'));
+$('#t-list').addEventListener('click',()=>setTab('list'));
+$('#region').addEventListener('change',e=>{region=e.target.value;if(tab!=='list')buildDeck(tab==='quiz');render();});
+$('#shuffle').addEventListener('click',()=>{buildDeck(true);render();});
+$('#search').addEventListener('input',e=>{search=e.target.value;render();});
+$('#voice').addEventListener('change',e=>{
+  const v=enVoices.find(x=>x.name===e.target.value);
+  if(v){chosenVoice=v;localStorage.setItem('wc_voice',v.name);speak('London');}
+});
+$('#stageBtn').addEventListener('click',enterStage);
+$('#stageExit').addEventListener('click',exitStage);
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&document.body.classList.contains('stage')){exitStage();return;}
+  if(e.target.tagName==='SELECT'||e.target.tagName==='INPUT')return;
+  if(tab==='cards'){if(e.key==='ArrowRight')next();else if(e.key==='ArrowLeft')prev();}
+  if(tab==='quiz'&&['1','2','3','4'].includes(e.key)){const b=document.querySelectorAll('.opt')[+e.key-1];if(b&&!b.disabled)b.click();}
+});
+
+/* voices load async — register both paths */
+loadVoices();
+if('speechSynthesis'in window&&speechSynthesis.onvoiceschanged!==undefined){
+  speechSynthesis.onvoiceschanged=loadVoices;
+}
+
+/* init */
+buildRegionSelect();
+buildFlagMarquee();
+animateCounter();
+$('#foot').innerHTML='<b>The count:</b> 195 capitals — the 193 UN member states plus Vatican City and Palestine (UN observer states). <b>Stage watch-outs:</b> South Africa has three capitals; Bolivia, Sri Lanka, Eswatini, Benin, Côte d\'Ivoire, the Netherlands and Tanzania split functions across cities; Indonesia is moving to Nusantara but Jakarta is still correct today; Kazakhstan switched back to Astana in 2022. <b>Pronunciation:</b> the respellings (capitals show the stressed syllable) are your source of truth — the 🔊 buttons use your device\'s built-in voice, which is convenient but imperfect on names like Ouagadougou and Reykjavík, so trust the respelling first. <span class="made">Current to June 2026 · Built for the family talent show.</span>';
+buildDeck(false);
+render();
+</script>
+</body>
+</html>

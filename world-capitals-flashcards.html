@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<title>World Capitals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme:light dark;
+    --bg:#FBFBFA;
+    --card:#FFFFFF;
+    --ink:#1B1B19;
+    --soft:#6B6B66;
+    --faint:#9A9A93;
+    --cyan:#04CCBA;
+    --cyan-deep:#018577;
+    --coral:#D9544A;
+    --line:#EAEAE5;
+    --line-2:#DCDCD5;
+    --r:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:26px 18px 90px}
+
+  /* Header */
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:500}
+  h1{font-family:'Libre Baskerville',serif;font-weight:700;font-size:clamp(28px,7vw,40px);margin:2px 0 0;letter-spacing:-.01em}
+  .sub{color:var(--soft);font-size:13.5px;margin-top:8px;max-width:560px}
+
+  /* Tabs */
+  .tabs{display:flex;gap:26px;margin:24px 0 0;border-bottom:1px solid var(--line)}
+  .tabs button{appearance:none;border:none;background:none;font:inherit;font-size:15px;font-weight:500;color:var(--faint);padding:0 0 12px;cursor:pointer;position:relative;transition:color .15s}
+  .tabs button:hover{color:var(--soft)}
+  .tabs button[aria-selected="true"]{color:var(--ink)}
+  .tabs button[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--cyan)}
+  .tabs button:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:3px}
+
+  /* Toolbar */
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:20px 0 6px}
+  .field{position:relative;display:inline-flex;align-items:center}
+  .field label{position:absolute;left:14px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);top:-7px;background:var(--bg);padding:0 4px}
+  select,input[type="search"]{font:inherit;font-size:14px;color:var(--ink);background:var(--card);border:1px solid var(--line-2);border-radius:10px;padding:11px 14px}
+  select{cursor:pointer;padding-right:30px}
+  select:focus,input:focus{outline:none;border-color:var(--cyan)}
+  .linkbtn{appearance:none;background:none;border:none;font:inherit;font-size:13.5px;font-weight:500;color:var(--cyan-deep);cursor:pointer;padding:8px 4px}
+  .linkbtn:hover{text-decoration:underline}
+  .linkbtn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:4px}
+
+  .count{margin:14px 2px 16px;font-size:12.5px;color:var(--faint);letter-spacing:.02em}
+  .count b{color:var(--soft);font-weight:600}
+
+  /* ---------- FLASHCARD ---------- */
+  .stage{perspective:1800px}
+  .card{position:relative;width:100%;min-height:330px;cursor:pointer;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+  .card.flipped{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:34px 26px}
+  .face .tl{position:absolute;top:16px;left:18px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .face .tr{position:absolute;top:16px;right:18px;font-size:11px;color:var(--faint)}
+  .flag{font-size:50px;line-height:1;margin-bottom:16px}
+  .country{font-family:'Libre Baskerville',serif;font-size:clamp(26px,7vw,40px);font-weight:700;line-height:1.08;letter-spacing:-.01em}
+  .say{margin-top:10px;font-size:14px;color:var(--soft);font-style:italic}
+  .say b{font-style:normal;font-weight:600;color:var(--ink)}
+  .hint{margin-top:22px;font-size:12px;color:var(--faint)}
+  .hint kbd{font-family:inherit;font-size:11px;border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:1px 6px;color:var(--soft)}
+
+  .back{transform:rotateY(180deg)}
+  .clabel{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan-deep);margin-bottom:10px}
+  .capital{font-family:'Libre Baskerville',serif;font-size:clamp(23px,6vw,34px);font-weight:700;line-height:1.12}
+  .note{margin-top:18px;max-width:430px;font-size:12.5px;line-height:1.5;color:var(--soft);border-top:1px solid var(--line);padding-top:14px}
+  .hear{margin-top:20px;display:inline-flex;align-items:center;gap:7px;background:none;color:var(--cyan-deep);border:1px solid var(--line-2);font:inherit;font-weight:500;font-size:13px;padding:8px 15px;border-radius:999px;cursor:pointer;transition:.15s}
+  .hear:hover{border-color:var(--cyan)}
+  .hear:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:20px}
+  .nav button{flex:1;font:inherit;font-weight:500;font-size:14px;background:var(--card);border:1px solid var(--line-2);border-radius:11px;padding:13px 14px;cursor:pointer;color:var(--ink);transition:.15s}
+  .nav button:hover:not(:disabled){border-color:var(--cyan)}
+  .nav button:disabled{color:var(--faint);cursor:default}
+  .nav button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+  .bar{height:3px;background:var(--line);border-radius:999px;overflow:hidden;margin:18px 2px 0}
+  .bar i{display:block;height:100%;background:var(--cyan);width:0;transition:width .35s}
+
+  /* ---------- QUIZ ---------- */
+  .quiz{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:30px 24px}
+  .qflag{font-size:40px;text-align:center;line-height:1;margin-bottom:8px}
+  .qp{text-align:center;color:var(--faint);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+  .qc{text-align:center;font-family:'Libre Baskerville',serif;font-size:clamp(24px,6vw,34px);font-weight:700;margin:6px 0 4px}
+  .qsay{text-align:center;font-size:13px;color:var(--soft);font-style:italic;margin-bottom:22px}
+  .opts{display:grid;gap:10px}
+  .opt{font:inherit;font-size:15px;font-weight:500;text-align:left;background:var(--card);border:1px solid var(--line-2);border-radius:12px;padding:15px 17px;cursor:pointer;color:var(--ink);transition:.12s;display:flex;align-items:center;gap:13px}
+  .opt:hover:not(:disabled){border-color:var(--cyan)}
+  .opt:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  .opt .k{font-size:12px;color:var(--faint);border:1px solid var(--line-2);border-radius:6px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex:none}
+  .opt.correct{border-color:var(--cyan);background:#F2FCFB}
+  .opt.correct .k{border-color:var(--cyan);color:var(--cyan-deep)}
+  .opt.wrong{border-color:var(--coral);background:#FCF3F2}
+  .opt.wrong .k{border-color:var(--coral);color:var(--coral)}
+  .opt:disabled{cursor:default}
+  .fb{min-height:22px;text-align:center;margin-top:18px;font-size:14px;font-weight:500}
+  .fb .ph{font-weight:400;font-style:italic;color:var(--soft)}
+  .qnextwrap{display:flex;justify-content:center;margin-top:14px}
+  .qnext{font:inherit;font-weight:500;font-size:14px;background:var(--card);border:1px solid var(--cyan);color:var(--cyan-deep);border-radius:11px;padding:12px 28px;cursor:pointer}
+  .qnext:hover{background:#F2FCFB}
+  .qnext:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  .chips{display:flex;gap:16px;justify-content:center;margin-top:18px;font-size:12.5px;color:var(--faint)}
+  .chips b{color:var(--ink);font-weight:600}
+  .chips .g b{color:var(--cyan-deep)}
+  .chips .w b{color:var(--coral)}
+
+  .done{text-align:center;padding:46px 16px;background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+  .done h2{font-family:'Libre Baskerville',serif;font-size:38px;margin:0 0 6px}
+  .done p{color:var(--soft);margin:0 0 22px;font-size:14px}
+  .done .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .done button{font:inherit;font-weight:500;font-size:14px;border-radius:11px;padding:12px 22px;cursor:pointer;border:1px solid var(--line-2);background:var(--card);color:var(--ink)}
+  .done button.key{border-color:var(--cyan);color:var(--cyan-deep)}
+  .done button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+  /* ---------- LIST ---------- */
+  .list{margin-top:4px}
+  .group{margin-top:22px}
+  .group:first-child{margin-top:6px}
+  .group h3{font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700;color:var(--cyan-deep);margin:0 0 4px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  .row-item{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:11px 4px;border-bottom:1px solid var(--line)}
+  .row-item .l{min-width:0}
+  .row-item .cn{font-size:15px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .row-item .cn .fl{font-size:16px}
+  .row-item .cp{font-size:12px;color:var(--faint);font-style:italic;margin-top:1px}
+  .row-item .rt{text-align:right;flex:none}
+  .row-item .ca{font-family:'Libre Baskerville',serif;font-size:15px;font-weight:400;color:var(--ink)}
+  .row-item .pp{font-size:12px;color:var(--faint);font-style:italic;margin-top:1px}
+  .empty{color:var(--faint);text-align:center;padding:40px;font-size:14px}
+
+  .foot{margin-top:38px;font-size:12px;line-height:1.6;color:var(--soft);border-top:1px solid var(--line);padding-top:16px}
+  .foot b{color:var(--ink)}
+
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#161719;
+      --card:#202125;
+      --ink:#EDEDEB;
+      --soft:#B2B2AC;
+      --faint:#86867F;
+      --cyan:#04CCBA;
+      --cyan-deep:#41DDCE;
+      --coral:#FF7066;
+      --line:#2E2F34;
+      --line-2:#3C3D43;
+    }
+    .opt.correct{background:rgba(4,204,186,.14)}
+    .opt.wrong{background:rgba(255,112,102,.14)}
+    .qnext:hover{background:rgba(4,204,186,.12)}
+    .done button.key:hover{background:rgba(4,204,186,.12)}
+  }
+  @media (max-width:480px){
+    .tabs{gap:18px}
+    .toolbar{gap:8px}
+  }
+  @media (prefers-reduced-motion:reduce){.card{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Talent-show prep · current to June 2026</span>
+    <h1>World Capitals</h1>
+    <p class="sub" id="sub"></p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button id="t-cards" role="tab" aria-selected="true">Flashcards</button>
+    <button id="t-quiz" role="tab" aria-selected="false">Quiz</button>
+    <button id="t-list" role="tab" aria-selected="false">List</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="field">
+      <label for="region">Continent</label>
+      <select id="region" aria-label="Filter by continent"></select>
+    </div>
+    <div class="field" id="searchField" style="display:none">
+      <label for="search">Find</label>
+      <input type="search" id="search" placeholder="country or capital">
+    </div>
+    <button class="linkbtn" id="shuffle">Shuffle</button>
+  </div>
+
+  <div class="count" id="count"></div>
+  <main id="app"></main>
+  <div class="foot" id="foot"></div>
+</div>
+
+<script>
+/* =========================================================
+   DATA  ·  c=country, cp=country say, cap=capital, p=capital say
+   r=continent, f=flag, n=note.  Current to June 2026.
+   Respellings: CAPS = stressed syllable (English approximation).
+   ========================================================= */
+const DATA=[
+/* AFRICA */
+{c:"Algeria",cp:"al-JEER-ee-uh",cap:"Algiers",p:"al-JEERZ",r:"Africa",f:"🇩🇿"},
+{c:"Angola",cp:"ang-GOH-lah",cap:"Luanda",p:"loo-AN-da",r:"Africa",f:"🇦🇴"},
+{c:"Benin",cp:"beh-NEEN",cap:"Porto-Novo",p:"POR-toh NOH-voh",r:"Africa",f:"🇧🇯",n:"Official capital; Cotonou is the seat of government."},
+{c:"Botswana",cp:"bot-SWAH-nah",cap:"Gaborone",p:"gab-uh-ROH-nay",r:"Africa",f:"🇧🇼"},
+{c:"Burkina Faso",cp:"bur-KEE-nah FAH-soh",cap:"Ouagadougou",p:"WAH-gah-DOO-goo",r:"Africa",f:"🇧🇫"},
+{c:"Burundi",cp:"buh-ROON-dee",cap:"Gitega",p:"gih-TEH-gah",r:"Africa",f:"🇧🇮",n:"Political capital since 2019; Bujumbura is the economic capital."},
+{c:"Cabo Verde",cp:"KAH-boh VAIR-day",cap:"Praia",p:"PRY-uh",r:"Africa",f:"🇨🇻"},
+{c:"Cameroon",cp:"kam-uh-ROON",cap:"Yaoundé",p:"yah-oon-DAY",r:"Africa",f:"🇨🇲"},
+{c:"Central African Republic",cp:"SEN-trul AF-rih-kun",cap:"Bangui",p:"bahn-GEE",r:"Africa",f:"🇨🇫"},
+{c:"Chad",cp:"CHAD",cap:"N'Djamena",p:"en-jah-MAY-nah",r:"Africa",f:"🇹🇩"},
+{c:"Comoros",cp:"KOM-uh-rohz",cap:"Moroni",p:"muh-ROH-nee",r:"Africa",f:"🇰🇲"},
+{c:"Congo (Republic)",cp:"KONG-goh",cap:"Brazzaville",p:"BRAZ-uh-vil",r:"Africa",f:"🇨🇬"},
+{c:"Congo (Dem. Rep.)",cp:"KONG-goh",cap:"Kinshasa",p:"kin-SHAH-sah",r:"Africa",f:"🇨🇩"},
+{c:"Côte d'Ivoire",cp:"koht dee-VWAR",cap:"Yamoussoukro",p:"yah-moo-SOO-kroh",r:"Africa",f:"🇨🇮",n:"Official capital; Abidjan is the economic hub."},
+{c:"Djibouti",cp:"jih-BOO-tee",cap:"Djibouti",p:"jih-BOO-tee",r:"Africa",f:"🇩🇯"},
+{c:"Egypt",cp:"EE-jipt",cap:"Cairo",p:"KY-roh",r:"Africa",f:"🇪🇬",n:"Official capital. The 'New Administrative Capital' east of Cairo now hosts the government's seat."},
+{c:"Equatorial Guinea",cp:"ek-wuh-TOR-ee-ul GIH-nee",cap:"Malabo",p:"mah-LAH-boh",r:"Africa",f:"🇬🇶"},
+{c:"Eritrea",cp:"air-ih-TREE-uh",cap:"Asmara",p:"az-MAR-ah",r:"Africa",f:"🇪🇷"},
+{c:"Eswatini",cp:"es-wah-TEE-nee",cap:"Mbabane",p:"em-bah-BAH-nay",r:"Africa",f:"🇸🇿",n:"Administrative capital; Lobamba is the royal and legislative capital."},
+{c:"Ethiopia",cp:"ee-thee-OH-pee-uh",cap:"Addis Ababa",p:"AD-iss AB-uh-buh",r:"Africa",f:"🇪🇹"},
+{c:"Gabon",cp:"gah-BOHN",cap:"Libreville",p:"LEE-bruh-vil",r:"Africa",f:"🇬🇦"},
+{c:"Gambia",cp:"GAM-bee-uh",cap:"Banjul",p:"BAN-jool",r:"Africa",f:"🇬🇲"},
+{c:"Ghana",cp:"GAH-nah",cap:"Accra",p:"uh-KRAH",r:"Africa",f:"🇬🇭"},
+{c:"Guinea",cp:"GIH-nee",cap:"Conakry",p:"KON-uh-kree",r:"Africa",f:"🇬🇳"},
+{c:"Guinea-Bissau",cp:"GIH-nee bih-SOW",cap:"Bissau",p:"bih-SOW",r:"Africa",f:"🇬🇼"},
+{c:"Kenya",cp:"KEN-yah",cap:"Nairobi",p:"ny-ROH-bee",r:"Africa",f:"🇰🇪"},
+{c:"Lesotho",cp:"luh-SOO-too",cap:"Maseru",p:"MA-seh-roo",r:"Africa",f:"🇱🇸"},
+{c:"Liberia",cp:"ly-BEER-ee-uh",cap:"Monrovia",p:"mun-ROH-vee-uh",r:"Africa",f:"🇱🇷"},
+{c:"Libya",cp:"LIH-bee-uh",cap:"Tripoli",p:"TRIP-uh-lee",r:"Africa",f:"🇱🇾"},
+{c:"Madagascar",cp:"mad-uh-GAS-kar",cap:"Antananarivo",p:"an-tah-NAH-nah-REE-voh",r:"Africa",f:"🇲🇬"},
+{c:"Malawi",cp:"mah-LAH-wee",cap:"Lilongwe",p:"lih-LONG-way",r:"Africa",f:"🇲🇼"},
+{c:"Mali",cp:"MAH-lee",cap:"Bamako",p:"BAH-mah-koh",r:"Africa",f:"🇲🇱"},
+{c:"Mauritania",cp:"mor-ih-TAY-nee-uh",cap:"Nouakchott",p:"nwahk-SHOT",r:"Africa",f:"🇲🇷"},
+{c:"Mauritius",cp:"muh-RISH-us",cap:"Port Louis",p:"port LOO-iss",r:"Africa",f:"🇲🇺"},
+{c:"Morocco",cp:"muh-ROK-oh",cap:"Rabat",p:"rah-BAHT",r:"Africa",f:"🇲🇦"},
+{c:"Mozambique",cp:"moh-zam-BEEK",cap:"Maputo",p:"mah-POO-toh",r:"Africa",f:"🇲🇿"},
+{c:"Namibia",cp:"nuh-MIH-bee-uh",cap:"Windhoek",p:"VINT-hook",r:"Africa",f:"🇳🇦"},
+{c:"Niger",cp:"NY-jur",cap:"Niamey",p:"nee-AH-may",r:"Africa",f:"🇳🇪"},
+{c:"Nigeria",cp:"ny-JEER-ee-uh",cap:"Abuja",p:"uh-BOO-jah",r:"Africa",f:"🇳🇬",n:"Capital since 1991; Lagos is the largest city."},
+{c:"Rwanda",cp:"roo-AHN-dah",cap:"Kigali",p:"kih-GAH-lee",r:"Africa",f:"🇷🇼"},
+{c:"São Tomé and Príncipe",cp:"sow toh-MEH and PRIN-sih-puh",cap:"São Tomé",p:"sow toh-MEH",r:"Africa",f:"🇸🇹"},
+{c:"Senegal",cp:"sen-ih-GAWL",cap:"Dakar",p:"dah-KAR",r:"Africa",f:"🇸🇳"},
+{c:"Seychelles",cp:"say-SHELZ",cap:"Victoria",p:"vik-TOR-ee-uh",r:"Africa",f:"🇸🇨"},
+{c:"Sierra Leone",cp:"see-AIR-uh lee-OHN",cap:"Freetown",p:"FREE-town",r:"Africa",f:"🇸🇱"},
+{c:"Somalia",cp:"soh-MAH-lee-uh",cap:"Mogadishu",p:"moh-gah-DEE-shoo",r:"Africa",f:"🇸🇴"},
+{c:"South Africa",cp:"south AF-rih-kuh",cap:"Pretoria",p:"pruh-TOR-ee-uh",r:"Africa",f:"🇿🇦",n:"Three capitals: Pretoria (executive), Bloemfontein (judicial), Cape Town (legislative)."},
+{c:"South Sudan",cp:"south soo-DAN",cap:"Juba",p:"JOO-bah",r:"Africa",f:"🇸🇸"},
+{c:"Sudan",cp:"soo-DAN",cap:"Khartoum",p:"kar-TOOM",r:"Africa",f:"🇸🇩"},
+{c:"Tanzania",cp:"tan-zuh-NEE-uh",cap:"Dodoma",p:"doh-DOH-mah",r:"Africa",f:"🇹🇿",n:"Official capital since 1996; Dar es Salaam is the largest city."},
+{c:"Togo",cp:"TOH-goh",cap:"Lomé",p:"loh-MAY",r:"Africa",f:"🇹🇬"},
+{c:"Tunisia",cp:"too-NEE-zhuh",cap:"Tunis",p:"TOO-niss",r:"Africa",f:"🇹🇳"},
+{c:"Uganda",cp:"yoo-GAN-dah",cap:"Kampala",p:"kam-PAH-lah",r:"Africa",f:"🇺🇬"},
+{c:"Zambia",cp:"ZAM-bee-uh",cap:"Lusaka",p:"loo-SAH-kah",r:"Africa",f:"🇿🇲"},
+{c:"Zimbabwe",cp:"zim-BAHB-way",cap:"Harare",p:"hah-RAR-ay",r:"Africa",f:"🇿🇼"},
+/* ASIA / MIDDLE EAST */
+{c:"Afghanistan",cp:"af-GAN-ih-stan",cap:"Kabul",p:"KAH-bool",r:"Asia",f:"🇦🇫"},
+{c:"Armenia",cp:"ar-MEE-nee-uh",cap:"Yerevan",p:"yeh-reh-VAHN",r:"Asia",f:"🇦🇲"},
+{c:"Azerbaijan",cp:"az-ur-by-JAHN",cap:"Baku",p:"bah-KOO",r:"Asia",f:"🇦🇿"},
+{c:"Bahrain",cp:"bah-RAYN",cap:"Manama",p:"mah-NAH-mah",r:"Asia",f:"🇧🇭"},
+{c:"Bangladesh",cp:"BAHNG-luh-desh",cap:"Dhaka",p:"DAH-kah",r:"Asia",f:"🇧🇩"},
+{c:"Bhutan",cp:"boo-TAHN",cap:"Thimphu",p:"THIM-poo",r:"Asia",f:"🇧🇹"},
+{c:"Brunei",cp:"broo-NY",cap:"Bandar Seri Begawan",p:"BAN-dar SEH-ree buh-GAH-wahn",r:"Asia",f:"🇧🇳"},
+{c:"Cambodia",cp:"kam-BOH-dee-uh",cap:"Phnom Penh",p:"puh-NOM PEN",r:"Asia",f:"🇰🇭"},
+{c:"China",cp:"CHY-nah",cap:"Beijing",p:"bay-JING",r:"Asia",f:"🇨🇳"},
+{c:"Cyprus",cp:"SY-prus",cap:"Nicosia",p:"nik-uh-SEE-uh",r:"Asia",f:"🇨🇾"},
+{c:"Georgia",cp:"JOR-juh",cap:"Tbilisi",p:"tuh-bih-LEE-see",r:"Asia",f:"🇬🇪"},
+{c:"India",cp:"IN-dee-uh",cap:"New Delhi",p:"new DEL-ee",r:"Asia",f:"🇮🇳"},
+{c:"Indonesia",cp:"in-duh-NEE-zhuh",cap:"Jakarta",p:"juh-KAR-tuh",r:"Asia",f:"🇮🇩",n:"Legal capital today. Nusantara (Borneo) is being built as the future political capital, targeted around 2028."},
+{c:"Iran",cp:"ih-RAHN",cap:"Tehran",p:"teh-RAHN",r:"Asia",f:"🇮🇷"},
+{c:"Iraq",cp:"ih-RAHK",cap:"Baghdad",p:"BAG-dad",r:"Asia",f:"🇮🇶"},
+{c:"Israel",cp:"IZ-ree-ul",cap:"Jerusalem",p:"juh-ROO-suh-lem",r:"Asia",f:"🇮🇱",n:"Declared capital; status is internationally disputed and most embassies are in Tel Aviv."},
+{c:"Japan",cp:"juh-PAN",cap:"Tokyo",p:"TOH-kee-oh",r:"Asia",f:"🇯🇵"},
+{c:"Jordan",cp:"JOR-dun",cap:"Amman",p:"ah-MAHN",r:"Asia",f:"🇯🇴"},
+{c:"Kazakhstan",cp:"kah-zak-STAHN",cap:"Astana",p:"ah-stah-NAH",r:"Asia",f:"🇰🇿",n:"Renamed Nur-Sultan in 2019, then changed back to Astana in 2022."},
+{c:"Kuwait",cp:"koo-WAYT",cap:"Kuwait City",p:"koo-WAYT SIH-tee",r:"Asia",f:"🇰🇼"},
+{c:"Kyrgyzstan",cp:"KEER-gih-stan",cap:"Bishkek",p:"bish-KEK",r:"Asia",f:"🇰🇬"},
+{c:"Laos",cp:"LAH-ohss",cap:"Vientiane",p:"vyen-TYAHN",r:"Asia",f:"🇱🇦"},
+{c:"Lebanon",cp:"LEB-uh-nun",cap:"Beirut",p:"bay-ROOT",r:"Asia",f:"🇱🇧"},
+{c:"Malaysia",cp:"muh-LAY-zhuh",cap:"Kuala Lumpur",p:"KWAH-lah LOOM-poor",r:"Asia",f:"🇲🇾",n:"Capital; Putrajaya is the administrative centre."},
+{c:"Maldives",cp:"MAWL-deevz",cap:"Malé",p:"MAH-lay",r:"Asia",f:"🇲🇻"},
+{c:"Mongolia",cp:"mong-GOH-lee-uh",cap:"Ulaanbaatar",p:"oo-lahn-BAH-tar",r:"Asia",f:"🇲🇳"},
+{c:"Myanmar",cp:"MYAN-mar",cap:"Naypyidaw",p:"NAY-pee-daw",r:"Asia",f:"🇲🇲",n:"Capital since 2006; Yangon (Rangoon) is the largest city."},
+{c:"Nepal",cp:"nuh-PAWL",cap:"Kathmandu",p:"kat-man-DOO",r:"Asia",f:"🇳🇵"},
+{c:"North Korea",cp:"north kuh-REE-uh",cap:"Pyongyang",p:"pyong-YANG",r:"Asia",f:"🇰🇵"},
+{c:"Oman",cp:"oh-MAHN",cap:"Muscat",p:"MUSS-kat",r:"Asia",f:"🇴🇲"},
+{c:"Pakistan",cp:"PAK-ih-stan",cap:"Islamabad",p:"iss-LAH-mah-bahd",r:"Asia",f:"🇵🇰"},
+{c:"Philippines",cp:"FIL-ih-peenz",cap:"Manila",p:"muh-NIL-uh",r:"Asia",f:"🇵🇭"},
+{c:"Qatar",cp:"KAH-tar",cap:"Doha",p:"DOH-hah",r:"Asia",f:"🇶🇦"},
+{c:"Saudi Arabia",cp:"SOW-dee uh-RAY-bee-uh",cap:"Riyadh",p:"ree-YAHD",r:"Asia",f:"🇸🇦"},
+{c:"Singapore",cp:"SING-uh-por",cap:"Singapore",p:"SING-uh-por",r:"Asia",f:"🇸🇬"},
+{c:"South Korea",cp:"south kuh-REE-uh",cap:"Seoul",p:"SOHL",r:"Asia",f:"🇰🇷"},
+{c:"Sri Lanka",cp:"shree LAHNG-kuh",cap:"Sri Jayawardenepura Kotte",p:"shree JY-uh-war-duh-nuh-POO-ruh KOT-tay",r:"Asia",f:"🇱🇰",n:"Official and legislative capital; Colombo is the commercial capital."},
+{c:"Syria",cp:"SEER-ee-uh",cap:"Damascus",p:"duh-MASS-kuss",r:"Asia",f:"🇸🇾"},
+{c:"Tajikistan",cp:"tah-JIH-kih-stan",cap:"Dushanbe",p:"doo-SHAN-beh",r:"Asia",f:"🇹🇯"},
+{c:"Thailand",cp:"TY-land",cap:"Bangkok",p:"BANG-kok",r:"Asia",f:"🇹🇭"},
+{c:"Timor-Leste",cp:"TEE-mor LESS-tay",cap:"Dili",p:"DEE-lee",r:"Asia",f:"🇹🇱"},
+{c:"Turkey (Türkiye)",cp:"TUR-kee",cap:"Ankara",p:"ANG-kuh-ruh",r:"Asia",f:"🇹🇷",n:"Istanbul is larger, but Ankara is the capital."},
+{c:"Turkmenistan",cp:"turk-MEN-ih-stan",cap:"Ashgabat",p:"ASH-gah-baht",r:"Asia",f:"🇹🇲"},
+{c:"United Arab Emirates",cp:"yoo-NY-ted AIR-ub EM-ur-uts",cap:"Abu Dhabi",p:"AH-boo DAH-bee",r:"Asia",f:"🇦🇪",n:"Capital; Dubai is the largest city."},
+{c:"Uzbekistan",cp:"ooz-BEK-ih-stan",cap:"Tashkent",p:"tash-KENT",r:"Asia",f:"🇺🇿"},
+{c:"Vietnam",cp:"vee-et-NAHM",cap:"Hanoi",p:"ha-NOY",r:"Asia",f:"🇻🇳"},
+{c:"Yemen",cp:"YEM-un",cap:"Sanaa",p:"sah-NAH",r:"Asia",f:"🇾🇪",n:"Recognized capital; Aden has served as a temporary seat during conflict."},
+{c:"Palestine",cp:"PAL-uh-styne",cap:"East Jerusalem (claimed)",p:"juh-ROO-suh-lem",r:"Asia",f:"🇵🇸",n:"UN observer state. Claims East Jerusalem; Ramallah is the de facto administrative seat."},
+{c:"Taiwan",cp:"ty-WAHN",cap:"Taipei",p:"ty-PAY",r:"Asia",f:"🇹🇼",n:"Self-governing; limited diplomatic recognition. Officially the Republic of China."},
+/* EUROPE */
+{c:"Albania",cp:"al-BAY-nee-uh",cap:"Tirana",p:"tih-RAH-nah",r:"Europe",f:"🇦🇱"},
+{c:"Andorra",cp:"an-DOR-uh",cap:"Andorra la Vella",p:"an-DOR-uh lah VEL-yah",r:"Europe",f:"🇦🇩"},
+{c:"Austria",cp:"AW-stree-uh",cap:"Vienna",p:"vee-EN-uh",r:"Europe",f:"🇦🇹"},
+{c:"Belarus",cp:"bel-uh-ROOS",cap:"Minsk",p:"MINSK",r:"Europe",f:"🇧🇾"},
+{c:"Belgium",cp:"BEL-jum",cap:"Brussels",p:"BRUSS-uls",r:"Europe",f:"🇧🇪"},
+{c:"Bosnia and Herzegovina",cp:"BOZ-nee-uh, hert-suh-goh-VEE-nuh",cap:"Sarajevo",p:"sah-rah-YAY-voh",r:"Europe",f:"🇧🇦"},
+{c:"Bulgaria",cp:"bul-GAIR-ee-uh",cap:"Sofia",p:"SOH-fee-uh",r:"Europe",f:"🇧🇬"},
+{c:"Croatia",cp:"kroh-AY-shuh",cap:"Zagreb",p:"ZAH-greb",r:"Europe",f:"🇭🇷"},
+{c:"Czechia",cp:"CHEK-ee-uh",cap:"Prague",p:"PRAHG",r:"Europe",f:"🇨🇿"},
+{c:"Denmark",cp:"DEN-mark",cap:"Copenhagen",p:"koh-pen-HAY-gen",r:"Europe",f:"🇩🇰"},
+{c:"Estonia",cp:"eh-STOH-nee-uh",cap:"Tallinn",p:"TAH-lin",r:"Europe",f:"🇪🇪"},
+{c:"Finland",cp:"FIN-lund",cap:"Helsinki",p:"HEL-sing-kee",r:"Europe",f:"🇫🇮"},
+{c:"France",cp:"FRANSS",cap:"Paris",p:"PA-riss",r:"Europe",f:"🇫🇷"},
+{c:"Germany",cp:"JUR-muh-nee",cap:"Berlin",p:"ber-LIN",r:"Europe",f:"🇩🇪"},
+{c:"Greece",cp:"GREESS",cap:"Athens",p:"ATH-enz",r:"Europe",f:"🇬🇷"},
+{c:"Hungary",cp:"HUNG-guh-ree",cap:"Budapest",p:"BOO-duh-pest",r:"Europe",f:"🇭🇺"},
+{c:"Iceland",cp:"EYESS-lund",cap:"Reykjavík",p:"RAYK-yah-vik",r:"Europe",f:"🇮🇸"},
+{c:"Ireland",cp:"EYER-lund",cap:"Dublin",p:"DUB-lin",r:"Europe",f:"🇮🇪"},
+{c:"Italy",cp:"IH-tuh-lee",cap:"Rome",p:"ROHM",r:"Europe",f:"🇮🇹"},
+{c:"Kosovo",cp:"KOH-soh-voh",cap:"Pristina",p:"PRISH-tee-nah",r:"Europe",f:"🇽🇰",n:"Partially recognized; not a UN member."},
+{c:"Latvia",cp:"LAT-vee-uh",cap:"Riga",p:"REE-gah",r:"Europe",f:"🇱🇻"},
+{c:"Liechtenstein",cp:"LIK-tun-styne",cap:"Vaduz",p:"vah-DOOTS",r:"Europe",f:"🇱🇮"},
+{c:"Lithuania",cp:"lith-oo-AY-nee-uh",cap:"Vilnius",p:"VIL-nee-us",r:"Europe",f:"🇱🇹"},
+{c:"Luxembourg",cp:"LUK-sum-burg",cap:"Luxembourg",p:"LUK-sem-burg",r:"Europe",f:"🇱🇺"},
+{c:"Malta",cp:"MAWL-tuh",cap:"Valletta",p:"vah-LET-tah",r:"Europe",f:"🇲🇹"},
+{c:"Moldova",cp:"mol-DOH-vuh",cap:"Chișinău",p:"kee-shee-NOW",r:"Europe",f:"🇲🇩"},
+{c:"Monaco",cp:"MON-uh-koh",cap:"Monaco",p:"MON-uh-koh",r:"Europe",f:"🇲🇨"},
+{c:"Montenegro",cp:"mon-tuh-NEE-groh",cap:"Podgorica",p:"POD-gor-eet-sah",r:"Europe",f:"🇲🇪"},
+{c:"Netherlands",cp:"NETH-ur-lundz",cap:"Amsterdam",p:"AM-ster-dam",r:"Europe",f:"🇳🇱",n:"Constitutional capital; the government and courts sit in The Hague."},
+{c:"North Macedonia",cp:"north mass-uh-DOH-nee-uh",cap:"Skopje",p:"SKOP-yeh",r:"Europe",f:"🇲🇰"},
+{c:"Norway",cp:"NOR-way",cap:"Oslo",p:"OZ-loh",r:"Europe",f:"🇳🇴"},
+{c:"Poland",cp:"POH-lund",cap:"Warsaw",p:"WAR-saw",r:"Europe",f:"🇵🇱"},
+{c:"Portugal",cp:"POR-chuh-gul",cap:"Lisbon",p:"LIZ-bun",r:"Europe",f:"🇵🇹"},
+{c:"Romania",cp:"roh-MAY-nee-uh",cap:"Bucharest",p:"BOO-kuh-rest",r:"Europe",f:"🇷🇴"},
+{c:"Russia",cp:"RUH-shuh",cap:"Moscow",p:"MOSS-koh",r:"Europe",f:"🇷🇺"},
+{c:"San Marino",cp:"san muh-REE-noh",cap:"San Marino",p:"san muh-REE-noh",r:"Europe",f:"🇸🇲"},
+{c:"Serbia",cp:"SUR-bee-uh",cap:"Belgrade",p:"BEL-grayd",r:"Europe",f:"🇷🇸"},
+{c:"Slovakia",cp:"sloh-VAH-kee-uh",cap:"Bratislava",p:"brat-ih-SLAH-vah",r:"Europe",f:"🇸🇰"},
+{c:"Slovenia",cp:"sloh-VEE-nee-uh",cap:"Ljubljana",p:"lyoo-blee-AH-nah",r:"Europe",f:"🇸🇮"},
+{c:"Spain",cp:"SPAYN",cap:"Madrid",p:"muh-DRID",r:"Europe",f:"🇪🇸"},
+{c:"Sweden",cp:"SWEE-dun",cap:"Stockholm",p:"STOK-hohm",r:"Europe",f:"🇸🇪"},
+{c:"Switzerland",cp:"SWIT-sur-lund",cap:"Bern",p:"BERN",r:"Europe",f:"🇨🇭"},
+{c:"Ukraine",cp:"yoo-KRAYN",cap:"Kyiv",p:"KEEV",r:"Europe",f:"🇺🇦"},
+{c:"United Kingdom",cp:"yoo-NY-ted KING-dum",cap:"London",p:"LUN-dun",r:"Europe",f:"🇬🇧"},
+{c:"Vatican City",cp:"VAT-ih-kun SIH-tee",cap:"Vatican City",p:"VAT-ih-kun SIH-tee",r:"Europe",f:"🇻🇦",n:"The Holy See, a UN observer rather than a member state."},
+/* NORTH AMERICA & CARIBBEAN */
+{c:"Antigua and Barbuda",cp:"an-TEE-gwuh, bar-BOO-duh",cap:"Saint John's",p:"saynt JONZ",r:"North America",f:"🇦🇬"},
+{c:"Bahamas",cp:"buh-HAH-muz",cap:"Nassau",p:"NASS-aw",r:"North America",f:"🇧🇸"},
+{c:"Barbados",cp:"bar-BAY-dohss",cap:"Bridgetown",p:"BRIJ-town",r:"North America",f:"🇧🇧"},
+{c:"Belize",cp:"buh-LEEZ",cap:"Belmopan",p:"bel-moh-PAN",r:"North America",f:"🇧🇿"},
+{c:"Canada",cp:"KAN-uh-duh",cap:"Ottawa",p:"OT-uh-wuh",r:"North America",f:"🇨🇦"},
+{c:"Costa Rica",cp:"KOH-stuh REE-kuh",cap:"San José",p:"san hoh-ZAY",r:"North America",f:"🇨🇷"},
+{c:"Cuba",cp:"KYOO-buh",cap:"Havana",p:"huh-VAN-uh",r:"North America",f:"🇨🇺"},
+{c:"Dominica",cp:"dom-ih-NEE-kuh",cap:"Roseau",p:"roh-ZOH",r:"North America",f:"🇩🇲"},
+{c:"Dominican Republic",cp:"duh-MIN-ih-kun",cap:"Santo Domingo",p:"SAN-toh doh-MING-goh",r:"North America",f:"🇩🇴"},
+{c:"El Salvador",cp:"el SAL-vuh-dor",cap:"San Salvador",p:"san SAL-vuh-dor",r:"North America",f:"🇸🇻"},
+{c:"Grenada",cp:"gruh-NAY-duh",cap:"Saint George's",p:"saynt JOR-jiz",r:"North America",f:"🇬🇩"},
+{c:"Guatemala",cp:"gwah-tuh-MAH-luh",cap:"Guatemala City",p:"gwah-tuh-MAH-lah SIH-tee",r:"North America",f:"🇬🇹"},
+{c:"Haiti",cp:"HAY-tee",cap:"Port-au-Prince",p:"port-oh-PRINS",r:"North America",f:"🇭🇹"},
+{c:"Honduras",cp:"hon-DOOR-us",cap:"Tegucigalpa",p:"teh-goo-see-GAL-pah",r:"North America",f:"🇭🇳"},
+{c:"Jamaica",cp:"juh-MAY-kuh",cap:"Kingston",p:"KING-stun",r:"North America",f:"🇯🇲"},
+{c:"Mexico",cp:"MEK-sih-koh",cap:"Mexico City",p:"MEK-sih-koh SIH-tee",r:"North America",f:"🇲🇽"},
+{c:"Nicaragua",cp:"nik-uh-RAH-gwuh",cap:"Managua",p:"mah-NAH-gwah",r:"North America",f:"🇳🇮"},
+{c:"Panama",cp:"PAN-uh-mah",cap:"Panama City",p:"PAN-uh-mah SIH-tee",r:"North America",f:"🇵🇦"},
+{c:"Saint Kitts and Nevis",cp:"saynt KITS, NEE-vis",cap:"Basseterre",p:"bahs-TAIR",r:"North America",f:"🇰🇳"},
+{c:"Saint Lucia",cp:"saynt LOO-shuh",cap:"Castries",p:"kas-TREE",r:"North America",f:"🇱🇨"},
+{c:"Saint Vincent & the Grenadines",cp:"saynt VIN-sunt, gren-uh-DEENZ",cap:"Kingstown",p:"KING-stown",r:"North America",f:"🇻🇨"},
+{c:"Trinidad and Tobago",cp:"TRIN-ih-dad, tuh-BAY-goh",cap:"Port of Spain",p:"port uv SPAYN",r:"North America",f:"🇹🇹"},
+{c:"United States",cp:"yoo-NY-ted STAYTS",cap:"Washington, D.C.",p:"WASH-ing-tun DEE-SEE",r:"North America",f:"🇺🇸"},
+/* SOUTH AMERICA */
+{c:"Argentina",cp:"ar-jun-TEE-nuh",cap:"Buenos Aires",p:"BWAY-nuss AIR-eez",r:"South America",f:"🇦🇷"},
+{c:"Bolivia",cp:"buh-LIH-vee-uh",cap:"Sucre",p:"SOO-kray",r:"South America",f:"🇧🇴",n:"Constitutional capital; La Paz is the seat of government."},
+{c:"Brazil",cp:"bruh-ZIL",cap:"Brasília",p:"brah-ZEEL-yah",r:"South America",f:"🇧🇷"},
+{c:"Chile",cp:"CHIH-lee",cap:"Santiago",p:"san-tee-AH-goh",r:"South America",f:"🇨🇱"},
+{c:"Colombia",cp:"kuh-LOM-bee-uh",cap:"Bogotá",p:"boh-goh-TAH",r:"South America",f:"🇨🇴"},
+{c:"Ecuador",cp:"EK-wuh-dor",cap:"Quito",p:"KEE-toh",r:"South America",f:"🇪🇨"},
+{c:"Guyana",cp:"gy-AN-uh",cap:"Georgetown",p:"JORJ-town",r:"South America",f:"🇬🇾"},
+{c:"Paraguay",cp:"PAIR-uh-gwy",cap:"Asunción",p:"ah-soon-see-OHN",r:"South America",f:"🇵🇾"},
+{c:"Peru",cp:"puh-ROO",cap:"Lima",p:"LEE-mah",r:"South America",f:"🇵🇪"},
+{c:"Suriname",cp:"SOOR-ih-nahm",cap:"Paramaribo",p:"pah-rah-MAH-ree-boh",r:"South America",f:"🇸🇷"},
+{c:"Uruguay",cp:"YOOR-uh-gwy",cap:"Montevideo",p:"mon-teh-vih-DAY-oh",r:"South America",f:"🇺🇾"},
+{c:"Venezuela",cp:"ven-uh-ZWAY-luh",cap:"Caracas",p:"kah-RAH-kahs",r:"South America",f:"🇻🇪"},
+/* OCEANIA */
+{c:"Australia",cp:"aw-STRAYL-yuh",cap:"Canberra",p:"KAN-bruh",r:"Oceania",f:"🇦🇺",n:"Capital; Sydney is the largest city."},
+{c:"Fiji",cp:"FEE-jee",cap:"Suva",p:"SOO-vah",r:"Oceania",f:"🇫🇯"},
+{c:"Kiribati",cp:"kih-rih-BAHSS",cap:"South Tarawa",p:"tah-RAH-wah",r:"Oceania",f:"🇰🇮",n:"The name is pronounced 'Kiribas' (the ti sounds like an s)."},
+{c:"Marshall Islands",cp:"MAR-shul EYE-lundz",cap:"Majuro",p:"mah-JOO-roh",r:"Oceania",f:"🇲🇭"},
+{c:"Micronesia",cp:"my-kruh-NEE-zhuh",cap:"Palikir",p:"PAH-lih-keer",r:"Oceania",f:"🇫🇲"},
+{c:"Nauru",cp:"nah-OO-roo",cap:"Yaren (de facto)",p:"YAR-en",r:"Oceania",f:"🇳🇷",n:"No official capital; government offices are in Yaren district."},
+{c:"New Zealand",cp:"noo ZEE-lund",cap:"Wellington",p:"WEL-ing-tun",r:"Oceania",f:"🇳🇿",n:"Capital; Auckland is the largest city."},
+{c:"Palau",cp:"pah-LOW",cap:"Ngerulmud",p:"nger-ROOL-mood",r:"Oceania",f:"🇵🇼",n:"Capital since 2006; Koror is the largest town."},
+{c:"Papua New Guinea",cp:"PAP-yoo-uh noo GIH-nee",cap:"Port Moresby",p:"port MORZ-bee",r:"Oceania",f:"🇵🇬"},
+{c:"Samoa",cp:"suh-MOH-uh",cap:"Apia",p:"ah-PEE-ah",r:"Oceania",f:"🇼🇸"},
+{c:"Solomon Islands",cp:"SOL-uh-mun EYE-lundz",cap:"Honiara",p:"hoh-nee-AR-ah",r:"Oceania",f:"🇸🇧"},
+{c:"Tonga",cp:"TONG-guh",cap:"Nuku'alofa",p:"noo-koo-ah-LOH-fah",r:"Oceania",f:"🇹🇴"},
+{c:"Tuvalu",cp:"too-VAH-loo",cap:"Funafuti",p:"foo-nah-FOO-tee",r:"Oceania",f:"🇹🇻"},
+{c:"Vanuatu",cp:"van-oo-AH-too",cap:"Port Vila",p:"port VEE-lah",r:"Oceania",f:"🇻🇺"},
+/* BONUS: disputed states & dependencies (not UN members) */
+{c:"Greenland",cp:"GREEN-lund",cap:"Nuuk",p:"NOOK",r:"Bonus",f:"🇬🇱",n:"Autonomous territory of Denmark."},
+{c:"Puerto Rico",cp:"PWAIR-toh REE-koh",cap:"San Juan",p:"san WAHN",r:"Bonus",f:"🇵🇷",n:"U.S. territory, not a sovereign country."},
+{c:"Hong Kong",cp:"hong KONG",cap:"City-state (no capital)",p:"hong KONG",r:"Bonus",f:"🇭🇰",n:"Special Administrative Region of China; no separate capital."},
+{c:"Western Sahara",cp:"WESS-turn suh-HAR-uh",cap:"El Aaiún (claimed)",p:"el ah-YOON",r:"Bonus",f:"🇪🇭",n:"Disputed. Controlled largely by Morocco; the SADR claims it with a capital-in-exile."},
+{c:"Northern Cyprus",cp:"NOR-thurn SY-prus",cap:"North Nicosia",p:"nik-uh-SEE-uh",r:"Bonus",f:"🏳️",n:"Recognized only by Turkey."},
+{c:"Cook Islands",cp:"kook EYE-lundz",cap:"Avarua",p:"ah-vah-ROO-ah",r:"Bonus",f:"🇨🇰",n:"In free association with New Zealand."},
+{c:"Faroe Islands",cp:"FAIR-oh EYE-lundz",cap:"Tórshavn",p:"TORS-hown",r:"Bonus",f:"🇫🇴",n:"Autonomous territory of Denmark."}
+];
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const $=s=>document.querySelector(s);
+const app=$('#app');
+let tab='cards';
+let region='All';
+let search='';
+let deck=[];
+let idx=0,flipped=false;
+let got=0,missed=0,missedList=[];
+
+const CONTINENTS=['All','Africa','Asia','Europe','North America','South America','Oceania','Bonus'];
+
+function buildRegionSelect(){
+  $('#region').innerHTML=CONTINENTS
+    .filter(r=>r==='All'||DATA.some(d=>d.r===r))
+    .map(r=>{const n=r==='All'?DATA.length:DATA.filter(d=>d.r===r).length;return `<option value="${r}">${r} · ${n}</option>`;})
+    .join('');
+}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function filtered(){return region==='All'?DATA.slice():DATA.filter(d=>d.r===region);}
+function buildDeck(doShuffle){deck=filtered();if(doShuffle)deck=shuffle(deck);idx=0;flipped=false;got=0;missed=0;missedList=[];}
+function speak(t){if(!('speechSynthesis'in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.rate=.85;speechSynthesis.speak(u);}
+function clean(s){return s.replace(/\s*\(.*?\)/g,'').trim();}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+function setTabUI(){
+  $('#t-cards').setAttribute('aria-selected',tab==='cards');
+  $('#t-quiz').setAttribute('aria-selected',tab==='quiz');
+  $('#t-list').setAttribute('aria-selected',tab==='list');
+  $('#searchField').style.display=tab==='list'?'inline-flex':'none';
+  $('#shuffle').style.display=tab==='list'?'none':'inline-block';
+}
+function setCount(){
+  const c=$('#count');
+  if(tab==='list'){const n=listData().length;c.innerHTML=`<b>${n}</b> ${n===1?'country':'countries'}${region==='All'?'':' in '+region}`;}
+  else c.innerHTML=`<b>${Math.min(idx+1,deck.length)}</b> of ${deck.length}${region==='All'?'':' · '+region}`;
+}
+function render(){setTabUI();setCount();if(tab==='cards')renderCards();else if(tab==='quiz')renderQuiz();else renderList();}
+
+/* ---- FLASHCARDS ---- */
+function renderCards(){
+  if(!deck.length){app.innerHTML='<div class="empty">No countries in this continent.</div>';return;}
+  const d=deck[idx];const pct=((idx+1)/deck.length)*100;
+  app.innerHTML=`
+    <div class="stage">
+      <div class="card ${flipped?'flipped':''}" id="card" tabindex="0" role="button" aria-label="Flashcard, activate to flip">
+        <div class="face front">
+          <span class="tl">${d.r}</span><span class="tr">${idx+1}/${deck.length}</span>
+          <div class="flag">${d.f}</div>
+          <div class="country">${d.c}</div>
+          <div class="say"><b>${d.cp}</b></div>
+          <button class="hear" id="hearC">Hear country</button>
+          <div class="hint">Tap to reveal capital · <kbd>space</kbd></div>
+        </div>
+        <div class="face back">
+          <span class="tl">${d.c}</span>
+          <div class="clabel">Capital</div>
+          <div class="capital">${d.cap}</div>
+          <div class="say"><b>${d.p}</b></div>
+          ${d.n?`<div class="note">${d.n}</div>`:''}
+          <button class="hear" id="hearCap">Hear capital</button>
+        </div>
+      </div>
+    </div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <div class="nav">
+      <button id="prev" ${idx===0?'disabled':''}>← Back</button>
+      <button id="flip">Flip card</button>
+      <button id="next" ${idx===deck.length-1?'disabled':''}>Next →</button>
+    </div>`;
+  const card=$('#card');
+  const doFlip=()=>{flipped=!flipped;card.classList.toggle('flipped');};
+  card.addEventListener('click',e=>{if(!e.target.classList.contains('hear'))doFlip();});
+  card.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();doFlip();}});
+  $('#flip').addEventListener('click',doFlip);
+  $('#prev').addEventListener('click',prev);
+  $('#next').addEventListener('click',next);
+  $('#hearC').addEventListener('click',e=>{e.stopPropagation();speak(clean(d.c));});
+  $('#hearCap').addEventListener('click',e=>{e.stopPropagation();speak(clean(d.cap));});
+}
+function next(){if(idx<deck.length-1){idx++;flipped=false;render();}}
+function prev(){if(idx>0){idx--;flipped=false;render();}}
+
+/* ---- QUIZ ---- */
+function distractorPool(){return DATA.filter(d=>!d.cap.includes('('));}
+function options(correct){
+  const pool=distractorPool().filter(d=>d.cap!==correct.cap);
+  return shuffle([correct.cap,...shuffle(pool).slice(0,3).map(d=>d.cap)]);
+}
+function renderQuiz(){
+  if(!deck.length){app.innerHTML='<div class="empty">No countries in this continent.</div>';return;}
+  if(idx>=deck.length){renderDone();return;}
+  const d=deck[idx];const opts=options(d);const pct=((idx+1)/deck.length)*100;
+  app.innerHTML=`
+    <div class="quiz">
+      <div class="qflag">${d.f}</div>
+      <div class="qp">Capital of</div>
+      <div class="qc">${d.c}</div>
+      <div class="qsay">${d.cp}</div>
+      <div class="opts" id="opts">
+        ${opts.map((o,i)=>`<button class="opt" data-cap="${encodeURIComponent(o)}"><span class="k">${i+1}</span><span>${o}</span></button>`).join('')}
+      </div>
+      <div class="fb" id="fb"></div>
+      <div class="qnextwrap" id="nx"></div>
+    </div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <div class="chips"><span class="g">Correct <b>${got}</b></span><span class="w">Review <b>${missed}</b></span></div>`;
+  const bs=Array.from(document.querySelectorAll('.opt'));
+  bs.forEach(b=>b.addEventListener('click',()=>answer(b,d,bs)));
+}
+function answer(btn,d,bs){
+  const chosen=decodeURIComponent(btn.dataset.cap);
+  bs.forEach(b=>{b.disabled=true;const cap=decodeURIComponent(b.dataset.cap);if(cap===d.cap)b.classList.add('correct');else if(b===btn)b.classList.add('wrong');});
+  const fb=$('#fb');
+  if(chosen===d.cap){got++;fb.innerHTML=`Correct. <span class="ph">${d.cap} · ${d.p}</span>`;fb.style.color='var(--cyan-deep)';}
+  else{missed++;missedList.push(d);fb.innerHTML=`It's <b>${d.cap}</b>. <span class="ph">${d.p}</span>`;fb.style.color='var(--coral)';}
+  $('#nx').innerHTML=`<button class="qnext" id="qn">Next →</button>`;
+  $('#qn').addEventListener('click',()=>{idx++;render();});
+  $('#qn').focus();
+}
+function renderDone(){
+  const total=got+missed;const score=total?Math.round(got/total*100):0;
+  app.innerHTML=`
+    <div class="done">
+      <h2>${score}%</h2>
+      <p>${got} correct · ${missed} to review · ${total} cards</p>
+      <div class="row">
+        ${missedList.length?`<button class="key" id="drill">Drill the ${missedList.length} you missed</button>`:''}
+        <button id="again">Restart deck</button>
+      </div>
+    </div>`;
+  if(missedList.length)$('#drill').addEventListener('click',()=>{deck=shuffle(missedList);idx=0;got=0;missed=0;missedList=[];render();});
+  $('#again').addEventListener('click',()=>{buildDeck(true);render();});
+}
+
+/* ---- LIST (alphabetical by country) ---- */
+function listData(){
+  let rows=filtered().slice().sort((a,b)=>a.c.localeCompare(b.c));
+  if(search){const q=search.toLowerCase();rows=rows.filter(d=>d.c.toLowerCase().includes(q)||d.cap.toLowerCase().includes(q));}
+  return rows;
+}
+function renderList(){
+  const rows=listData();
+  if(!rows.length){app.innerHTML='<div class="empty">Nothing matches.</div>';return;}
+  let html='<div class="list">';let letter='';
+  rows.forEach(d=>{
+    const L=d.c[0].toUpperCase();
+    if(L!==letter){if(letter!=='')html+='</div>';letter=L;html+=`<div class="group"><h3>${L}</h3>`;}
+    html+=`
+      <div class="row-item">
+        <div class="l">
+          <div class="cn"><span class="fl">${d.f}</span>${d.c}</div>
+        </div>
+        <div class="rt">
+          <div class="ca">${d.cap}</div>
+        </div>
+      </div>`;
+  });
+  html+='</div></div>';
+  app.innerHTML=html;
+}
+
+/* =========================================================
+   WIRING
+   ========================================================= */
+function setTab(t){tab=t;if(t!=='list')buildDeck(t==='quiz');render();}
+$('#t-cards').addEventListener('click',()=>setTab('cards'));
+$('#t-quiz').addEventListener('click',()=>setTab('quiz'));
+$('#t-list').addEventListener('click',()=>setTab('list'));
+$('#region').addEventListener('change',e=>{region=e.target.value;if(tab!=='list')buildDeck(tab==='quiz');render();});
+$('#shuffle').addEventListener('click',()=>{buildDeck(true);render();});
+$('#search').addEventListener('input',e=>{search=e.target.value;render();});
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='SELECT'||e.target.tagName==='INPUT')return;
+  if(tab==='cards'){if(e.key==='ArrowRight')next();else if(e.key==='ArrowLeft')prev();}
+  if(tab==='quiz'&&['1','2','3','4'].includes(e.key)){const b=document.querySelectorAll('.opt')[+e.key-1];if(b&&!b.disabled)b.click();}
+});
+
+/* init */
+buildRegionSelect();
+$('#sub').textContent='193 UN members plus Vatican City, Palestine, Kosovo and Taiwan, with a bonus tier of territories. '+DATA.length+' cards, each with country and capital pronunciations.';
+$('#foot').innerHTML='<b>The count:</b> 193 UN member states, plus Vatican City and Palestine (UN observers), Kosovo and Taiwan (widely recognized), and a Bonus tier of territories that are not sovereign countries. <b>Stage watch-outs:</b> South Africa has three capitals; Bolivia, Sri Lanka, Eswatini, Benin, Côte d\'Ivoire, the Netherlands and Tanzania split functions across cities; Indonesia is moving to Nusantara but Jakarta is still correct today; Kazakhstan switched back to Astana in 2022. <b>Pronunciation:</b> respellings are an English-speaker\'s approximation (capitals show the stressed syllable). The Hear buttons use your device voice, which is convenient but imperfect on names like Ouagadougou, so trust the respelling first.';
+buildDeck(false);
+render();
+</script>
+</body>
+</html>
