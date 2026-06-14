@@ -418,7 +418,21 @@
     .row-item .sp:hover{color:var(--gold-deep);background:var(--gold-soft)}
     .qquit:hover{border-color:var(--accent);color:var(--accent)}
     .qdaily:hover{transform:translateY(-2px)}
+    .qchal:hover{transform:translateY(-2px)}
+    .qr-chal:hover{background:#FFEDD5;border-color:#D97706}
   }
+  .qchal{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;font:inherit;cursor:pointer;background:linear-gradient(135deg,#B45309,#D97706);color:#fff;border:none;border-radius:14px;padding:15px 18px;margin-bottom:11px;box-shadow:var(--shadow)}
+  .qchal-l b{display:block;font-size:15px;font-weight:800}
+  .qchal-l small{display:block;font-size:11.5px;color:#FFE8C7;font-weight:500;margin-top:2px}
+  .qchal-go{flex:none;font-weight:800;font-size:15px}
+  .qchal:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .qr-chal{width:100%;margin-top:11px;font:inherit;font-weight:700;font-size:15px;cursor:pointer;background:#FFF7ED;color:#B45309;border:1px solid rgba(180,83,9,.28);border-radius:13px;padding:15px;box-shadow:var(--shadow-sm)}
+  .qr-chal:focus-visible{outline:2px solid #D97706;outline-offset:2px}
+  .qr-h2h{margin:4px 0 18px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card);box-shadow:var(--shadow-sm)}
+  .qr-h2h-row{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;font-size:15px;font-weight:600;color:var(--ink)}
+  .qr-h2h-row.me{background:var(--accent-soft);color:var(--accent);font-weight:800;border-bottom:1px solid var(--line)}
+  .qr-h2h-row b{font-weight:800}
+  .qr-h2h-result{text-align:center;padding:12px;font-size:15px;font-weight:800;color:var(--good);background:var(--good-soft);border-top:1px solid var(--line)}
 </style>
 </head>
 <body>
@@ -846,7 +860,7 @@ function qdiff(d){return EASY.has(d.c)?'easy':HARD.has(d.c)?'hard':'medium';}
 let qPhase='setup';
 let qCfg={count:10,diff:'medium',mode:'capital',region:'All'};
 let qList=[],qIdx=0,qScore=0,qStreak=0,qBestStreak=0,qCorrect=0,qSpeedSum=0,qMissed=[];
-let qAnswered=false,qTimer=null,qStart=0,qTotalMs=0,qSeed=0,qDaily=false,qChal=null;
+let qAnswered=false,qTimer=null,qStart=0,qTotalMs=0,qSeed=0,qDaily=false,qChal=null,qChalPlaying=false;
 
 function qClearTimer(){if(qTimer){clearInterval(qTimer);qTimer=null;}}
 function qPool(){
@@ -881,10 +895,23 @@ function qBuildSeeded(seed,cfg){
   });
   qIdx=0;qScore=0;qStreak=0;qBestStreak=0;qCorrect=0;qSpeedSum=0;qMissed=[];qTotalMs=0;
 }
-function qBuild(){qDaily=false;qChal=null;qBuildSeeded((Math.random()*2147483647)|0,qCfg);}
+function qBuild(){qDaily=false;qChal=null;qChalPlaying=false;qBuildSeeded((Math.random()*2147483647)|0,qCfg);}
 function qDailyKey(d){d=d||new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
 function qDailySeed(){const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
-function qBuildDaily(){qDaily=true;qChal=null;qBuildSeeded(qDailySeed(),{count:10,mode:'mixed',diff:null,region:'All'});}
+function qBuildDaily(){qDaily=true;qChal=null;qChalPlaying=false;qBuildSeeded(qDailySeed(),{count:10,mode:'mixed',diff:null,region:'All'});}
+const QMODE_ENC={capital:'c',country:'o',mixed:'x'},QMODE_DEC={c:'capital',o:'country',x:'mixed'};
+const QDIFF_ENC={easy:'e',medium:'m',hard:'h'},QDIFF_DEC={e:'easy',m:'medium',h:'hard',a:null};
+function qRunCfg(){return qDaily?{count:qList.length,mode:'mixed',diff:null,region:'All'}:{count:qList.length,mode:qCfg.mode,diff:qCfg.diff,region:qCfg.region};}
+function qChalEncode(rating){const c=qRunCfg();const nm=encodeURIComponent((localStorage.getItem('wc_name')||'A friend').slice(0,16));return location.origin+'/?c='+[qSeed,c.count,QMODE_ENC[c.mode]||'x',c.diff?QDIFF_ENC[c.diff]:'a',CONTINENTS.indexOf(c.region||'All'),qScore,rating,nm].join('.');}
+function qChalDecode(s){const p=String(s).split('.');if(p.length<7)return null;const seed=parseInt(p[0],10);if(!isFinite(seed))return null;const dk=p[3];return {seed:seed,count:Math.min(20,Math.max(1,parseInt(p[1],10)||10)),mode:QMODE_DEC[p[2]]||'mixed',diff:(dk in QDIFF_DEC)?QDIFF_DEC[dk]:null,region:CONTINENTS[parseInt(p[4],10)]||'All',score:parseInt(p[5],10)||0,rating:Math.min(100,Math.max(0,parseInt(p[6],10)||0)),name:decodeURIComponent(p[7]||'A friend')};}
+function qBuildChallenge(){qDaily=false;qChalPlaying=true;qBuildSeeded(qChal.seed,{count:qChal.count,mode:qChal.mode,diff:qChal.diff,region:qChal.region});}
+function qChallengeShare(rating){
+  if(!localStorage.getItem('wc_name')){const nm=window.prompt('Your name (shown to your friend):','');if(nm&&nm.trim())localStorage.setItem('wc_name',nm.trim().slice(0,16));}
+  const url=qChalEncode(rating);
+  const txt='I scored '+qGrade(rating)+' ('+rating+'/100) on World Capitals. Play my exact '+qList.length+' and beat me:';
+  if(navigator.share){navigator.share({title:'World Capitals challenge',text:txt,url:url}).catch(function(){});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(txt+' '+url).then(function(){const x=document.getElementById('qchalshare');if(x){x.textContent='Link copied!';setTimeout(function(){x.innerHTML='&#127919; Challenge a friend';},1800);}}).catch(function(){});}
+}
 function fmtTime(s){s=Math.floor(s);const m=Math.floor(s/60),r=s%60;return m+':'+(r<10?'0':'')+r;}
 
 function qMaxScore(n){let s=0;for(let i=1;i<=n;i++)s+=1000*Math.min(1+0.2*(i-1),2);return s;}
@@ -912,6 +939,7 @@ function renderQuizSetup(){
   const regions=['All',...CONTINENTS.filter(r=>r!=='All')].map(r=>`<option value="${r}"${qCfg.region===r?' selected':''}>${r==='All'?'All continents':r}</option>`).join('');
   app.innerHTML=`
     <div class="qsetup">
+      ${qChal?`<button class="qchal" id="qchalstart"><span class="qchal-l"><b>&#127919; ${qChal.name} challenged you</b><small>Beat ${qGrade(qChal.rating)} (${qChal.rating}/100) on the same ${qChal.count} questions</small></span><span class="qchal-go">Play &rarr;</span></button>`:''}
       <div class="qsetup-head"><h2>Quiz mode</h2><p>Jump straight in, or build your own challenge.</p></div>
       <button class="qdaily" id="qdaily">
         <span class="qdaily-l"><b>&#127757; Today&#39;s Challenge</b><small>${ddone?'Completed today &mdash; play again':'10 capitals, the same for everyone today'}</small></span>
@@ -926,6 +954,7 @@ function renderQuizSetup(){
       ${bestR?`<div class="qbest">Your best on ${qDiffLabel(qCfg.diff)}: <b>${qGrade(bestR)}</b> &middot; ${bestR}/100</div>`:''}
       <button class="qstart" id="qstart"${avail<1?' disabled':''}>${avail<1?'No capitals match &mdash; widen your filters':'Start quiz &middot; '+eff+' question'+(eff===1?'':'s')}<svg class="ico" width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>`;
+  if(qChal)$('#qchalstart').addEventListener('click',()=>{qBuildChallenge();qPhase='play';render();});
   $('#qdaily').addEventListener('click',()=>{qBuildDaily();qPhase='play';render();});
   $('#qquick').addEventListener('click',()=>{qCfg={count:10,diff:'medium',mode:'mixed',region:'All'};qBuild();qPhase='play';render();});
   app.querySelectorAll('.qpill').forEach(b=>{if(b.disabled)return;b.addEventListener('click',()=>{const s=b.dataset.set;qCfg[s]=s==='count'?+b.dataset.val:b.dataset.val;render();});});
@@ -1080,16 +1109,19 @@ function renderQuizDone(){
         <div class="qr-stat"><div class="n">${avg.toFixed(1)}s</div><div class="l">Avg / question</div></div>
         <div class="qr-stat"><div class="n">${fmtTime(tot)}</div><div class="l">Total time</div></div>
       </div>
+      ${qChalPlaying&&qChal?`<div class="qr-h2h"><div class="qr-h2h-row me"><span>You</span><b>${grade} &middot; ${rating}</b></div><div class="qr-h2h-row"><span>${qChal.name}</span><b>${qGrade(qChal.rating)} &middot; ${qChal.rating}</b></div><div class="qr-h2h-result">${rating>qChal.rating?'&#127942; You win!':(rating<qChal.rating?'So close, run it back!':'A tie!')}</div></div>`:''}
       <div class="qr-row">
         <button class="qstart" id="qplay">Play again</button>
         <button class="qr-alt" id="qshare"><svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg> Share result</button>
       </div>
+      <button class="qr-chal" id="qchalshare">&#127919; Challenge a friend</button>
       <button class="qr-link" id="qchange">Change settings</button>
       ${qMissed.length?`<div class="qreview"><div class="qrev-h">Correct answers (the ${qMissed.length} you missed)</div>${qMissed.map(m=>`<div class="qrev-item"><span class="qrev-c">${m.item.f} ${m.item.c}</span><span class="qrev-a">${m.item.cap}</span></div>`).join('')}</div>`:`<div class="qreview perfect">Flawless run. Not a single miss.</div>`}
     </div>`;
   $('#qplay').addEventListener('click',()=>{qBuild();qPhase='play';render();});
   $('#qchange').addEventListener('click',()=>{qPhase='setup';render();});
   $('#qshare').addEventListener('click',()=>qShare(grade,rating,dl,n));
+  $('#qchalshare').addEventListener('click',()=>qChallengeShare(rating));
   document.getElementById('tool').scrollIntoView();
 }
 
@@ -1182,6 +1214,7 @@ var _bb=document.getElementById('browseBtn');if(_bb)_bb.addEventListener('click'
 $('#foot').innerHTML='<p class="foot-p"><b>The count:</b> 195 capitals: the 193 UN member states plus Vatican City and Palestine (UN observer states).</p><p class="foot-p"><b>Watch-outs:</b> South Africa has three capitals; Bolivia, Sri Lanka, Eswatini, Benin, C\u00f4te d\'Ivoire, the Netherlands and Tanzania split functions across cities; Indonesia is moving to Nusantara but Jakarta is still correct today; Kazakhstan switched back to Astana in 2022.</p><p class="foot-p"><b>Pronunciation:</b> the respellings (capitals show the stressed syllable) are your source of truth.</p><span class="made">Current to June 2026.</span><div class="foot-credit">Created by Ali Mamujee - <a href="https://www.linkedin.com/in/alimamujee/" target="_blank" rel="noopener noreferrer">LinkedIn</a> - <a href="https://www.alimamujee.com" target="_blank" rel="noopener noreferrer">Website</a></div>';
 buildDeck(false);
 render();
+(function(){try{var c=new URLSearchParams(location.search).get('c');if(c){var d=qChalDecode(c);if(d){qChal=d;setTab('quiz');}}}catch(e){}})();
 </script>
 </body>
 </html>
