@@ -15,6 +15,10 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="World Capitals: 195 from memory">
 <meta name="twitter:description" content="Browse, flip, and quiz your way through all 195 sovereign capitals.">
+<meta property="og:image" content="https://www.worldcapitals.co/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://www.worldcapitals.co/og.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230B0F1A'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23E8B04B' stroke-width='3'/%3E%3Cellipse cx='50' cy='50' rx='13' ry='30' fill='none' stroke='%23E8B04B' stroke-width='3'/%3E%3Cline x1='20' y1='50' x2='80' y2='50' stroke='%23E8B04B' stroke-width='3'/%3E%3Ccircle cx='50' cy='50' r='4' fill='%23F6C964'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -297,6 +301,9 @@
   .qr-alt{font:inherit;font-weight:700;font-size:15px;cursor:pointer;background:var(--card);color:var(--ink);border:1px solid var(--line-2);border-radius:13px;padding:16px 20px;transition:.16s;box-shadow:var(--shadow-sm)}
   .qr-alt:hover{border-color:var(--accent);color:var(--accent)}
   .qr-alt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .qr-link{display:block;margin:14px auto 0;font:inherit;font-weight:600;font-size:13.5px;color:var(--soft);background:none;border:none;cursor:pointer;padding:6px}
+  .qr-link:hover{color:var(--accent);text-decoration:underline}
+  .qr-link:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
   .qreview{margin-top:24px;text-align:left;border-top:1px solid var(--line);padding-top:18px}
   .qreview.perfect{text-align:center;color:var(--good);font-weight:700;font-size:14px}
   .qrev-h{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
@@ -919,6 +926,12 @@ function qRank(acc){
   if(acc>=50)return'Wandering Traveler';
   return'Map in Training';
 }
+function qShare(grade,rating,dl,n){
+  const txt=`World Capitals quiz\nGrade ${grade} (${rating}/100) on ${dl}, ${qModeLabel(qCfg.mode)} mode\n${qCorrect}/${n} correct, best streak ${qBestStreak}. Can you beat it?`;
+  const url='https://www.worldcapitals.co';
+  if(navigator.share){navigator.share({title:'World Capitals',text:txt,url}).catch(()=>{});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(txt+'\n'+url).then(()=>{const x=document.getElementById('qshare');if(x){x.textContent='Copied!';setTimeout(()=>{x.textContent='Share result';},1800);}}).catch(()=>{});}
+}
 function renderQuizDone(){
   qClearTimer();
   const n=qList.length,acc=n?Math.round(qCorrect/n*100):0,tot=qTotalMs/1000,avg=n?tot/n:0;
@@ -946,12 +959,14 @@ function renderQuizDone(){
       </div>
       <div class="qr-row">
         <button class="qstart" id="qplay">Play again</button>
-        <button class="qr-alt" id="qchange">Change settings</button>
+        <button class="qr-alt" id="qshare">Share result</button>
       </div>
+      <button class="qr-link" id="qchange">Change settings</button>
       ${qMissed.length?`<div class="qreview"><div class="qrev-h">Review the ${qMissed.length} you missed</div>${qMissed.map(m=>`<div class="qrev-item"><span class="qrev-c">${m.item.f} ${m.item.c}</span><span class="qrev-a">${m.item.cap}</span></div>`).join('')}</div>`:`<div class="qreview perfect">Flawless run. Not a single miss.</div>`}
     </div>`;
   $('#qplay').addEventListener('click',()=>{qBuild();qPhase='play';render();});
   $('#qchange').addEventListener('click',()=>{qPhase='setup';render();});
+  $('#qshare').addEventListener('click',()=>qShare(grade,rating,dl,n));
 }
 
 /* ---- BROWSE (alphabetical by country) ---- */
