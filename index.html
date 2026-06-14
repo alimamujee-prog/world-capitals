@@ -58,7 +58,6 @@
     background:var(--bg);color:var(--ink);
     font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;
     -webkit-font-smoothing:antialiased;line-height:1.6;
-    overflow-x:hidden;
   }
   ::selection{background:rgba(37,99,235,.16)}
   svg.ico{display:inline-block;vertical-align:-2px;flex:none}
@@ -116,6 +115,60 @@
     animation:slide 128s linear infinite;will-change:transform}
   .marquee:hover .marquee-track{animation-play-state:paused}
   @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* ====================== FLAG MORPH HERO ====================== */
+  .fhero{position:relative;height:200vh}
+  .fhero-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;
+    background:radial-gradient(60% 55% at 50% 15%, #EAF1FE 0%, #FFFFFF 58%, #F5F7FA 100%)}
+  .fhero-grid{position:absolute;inset:0;opacity:.5;pointer-events:none;
+    background-image:linear-gradient(#E2E8F0 1px,transparent 1px),linear-gradient(90deg,#E2E8F0 1px,transparent 1px);
+    background-size:46px 46px;
+    -webkit-mask-image:radial-gradient(70% 60% at 50% 40%,#000,transparent 78%);
+            mask-image:radial-gradient(70% 60% at 50% 40%,#000,transparent 78%)}
+  .fcards{position:absolute;inset:0;z-index:1}
+  .fcard{position:absolute;left:50%;top:50%;width:64px;height:90px;opacity:0;
+    will-change:transform,opacity;perspective:1000px}
+  .finner{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+    transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+  .fcard:hover .finner{transform:rotateY(180deg)}
+  .fface{position:absolute;inset:0;border-radius:11px;overflow:hidden;
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    box-shadow:0 10px 22px -8px rgba(15,23,42,.32),0 2px 6px -2px rgba(15,23,42,.18)}
+  .ffront{background:#fff;border:1px solid rgba(15,23,42,.08)}
+  .ffront img{width:100%;height:100%;object-fit:cover;display:block}
+  .fback{background:linear-gradient(160deg,#1D2A44,#0F172A);color:#fff;transform:rotateY(180deg);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6px;border:1px solid #233152}
+  .fback .lab{font-size:7px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#7FB2FF;margin-bottom:3px}
+  .fback .nm{font-size:10px;font-weight:700;line-height:1.15}
+
+  .fhero-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
+    text-align:center;width:92%;max-width:600px;pointer-events:none}
+  .fhero-center h1{font-size:clamp(46px,8.5vw,88px);font-weight:800;letter-spacing:-.035em;line-height:1;color:var(--ink)}
+  .fhero-center .hl{color:var(--accent)}
+  .fhero-sub{color:var(--soft);font-size:clamp(15px,2.2vw,18px);margin-top:20px;font-weight:500}
+  .fhero-ded{position:relative;margin:18px auto 0;max-width:430px;padding-top:18px;
+    font-size:14px;font-style:italic;font-weight:500;line-height:1.55;color:var(--ink-2)}
+  .fhero-ded::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:42px;height:2px;border-radius:2px;background:var(--accent)}
+  .fhero-center .btn{margin-top:26px;pointer-events:auto}
+  .fhero-cue{margin-top:22px;font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+  .fhero-cue span{display:inline-block;animation:bob 2s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(5px);opacity:1}}
+
+  .fhero-arc{position:absolute;left:50%;top:7%;transform:translateX(-50%);z-index:2;
+    text-align:center;width:92%;max-width:600px;opacity:0;pointer-events:none}
+  .fhero-arc h2{font-size:clamp(26px,4.6vw,46px);font-weight:800;letter-spacing:-.03em;color:var(--ink)}
+  .fhero-arc .hl{color:var(--accent)}
+  .fhero-arc p{color:var(--soft);margin-top:12px;font-size:clamp(14px,1.8vw,16px);max-width:480px;margin-left:auto;margin-right:auto}
+
+  @media (max-width:600px){
+    .fcard{width:50px;height:70px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .fcard:hover .finner{transition:none}
+    .fhero-cue span{animation:none}
+  }
+
 
   /* ======================================================
      TOOL
@@ -383,25 +436,27 @@
 </head>
 <body>
 <!-- ============================== HERO ============================== -->
-<header class="hero">
-  <h1>World <span class="hl">Capitals</span></h1>
-  <p class="hero-sub">Every UN recognized world capital. Browse them, flip them, quiz yourself, and hear the hard ones spoken aloud.</p>
-  <p class="hero-dedicate">To my Khatri family, the most beautiful, generous, and loving people in the world.</p>
+<section class="fhero" id="fhero">
+  <div class="fhero-sticky" id="fheroSticky">
+    <div class="fhero-grid"></div>
+    <div class="fcards" id="fcards"></div>
 
-  <div class="stats">
-    <div class="stat"><div class="n" id="counter">195</div><div class="l">Capitals</div></div>
-    <div class="stat"><div class="n">6</div><div class="l">Continents</div></div>
-    <div class="stat"><div class="n">1</div><div class="l">World</div></div>
+    <div class="fhero-center" id="fheroCenter">
+      <h1>World <span class="hl">Capitals</span></h1>
+      <p class="fhero-sub">Every UN recognized world capital, in orbit.</p>
+      <p class="fhero-ded">To my Khatri family, the most beautiful, generous, and loving people in the world.</p>
+      <a href="#tool" class="btn btn-primary" id="startBtn">Start practicing
+        <svg class="ico" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <div class="fhero-cue"><span>Scroll to explore &darr;</span></div>
+    </div>
+
+    <div class="fhero-arc" id="fheroArc">
+      <h2>Every flag. <span class="hl">Every capital.</span></h2>
+      <p>195 countries fanned across the world. Keep scrolling to start practicing.</p>
+    </div>
   </div>
-
-  <div class="cta-row">
-    <a href="#tool" class="btn btn-primary" id="startBtn">Start practicing
-      <svg class="ico" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </a>
-  </div>
-
-  <div class="marquee" aria-hidden="true"><div class="marquee-track" id="flagTrack"></div></div>
-</header>
+</section>
 
 <!-- ============================== TOOL ============================== -->
 <main class="tool" id="tool">
@@ -1068,6 +1123,107 @@ animateCounter();
 $('#foot').innerHTML='<b>The count:</b> 195 capitals: the 193 UN member states plus Vatican City and Palestine (UN observer states). <b>Watch-outs:</b> South Africa has three capitals; Bolivia, Sri Lanka, Eswatini, Benin, C\u00f4te d\'Ivoire, the Netherlands and Tanzania split functions across cities; Indonesia is moving to Nusantara but Jakarta is still correct today; Kazakhstan switched back to Astana in 2022. <b>Pronunciation:</b> the respellings (capitals show the stressed syllable) are your source of truth. The speaker buttons use your device\'s built-in voice, which is convenient but imperfect on names like Ouagadougou and Reykjav\u00edk, so trust the respelling first. <span class="made">Current to June 2026.</span>';
 buildDeck(false);
 render();
+</script>
+<script>
+/* ====================== FLAG MORPH HERO ====================== */
+(function(){
+  const FLAGS=[
+    ["us","United States"],["gb","United Kingdom"],["fr","France"],["de","Germany"],["it","Italy"],
+    ["es","Spain"],["pt","Portugal"],["ie","Ireland"],["nl","Netherlands"],["be","Belgium"],
+    ["ch","Switzerland"],["se","Sweden"],["no","Norway"],["dk","Denmark"],["gr","Greece"],
+    ["pl","Poland"],["jp","Japan"],["cn","China"],["kr","South Korea"],["in","India"],
+    ["th","Thailand"],["br","Brazil"],["ar","Argentina"],["cl","Chile"],["mx","Mexico"],
+    ["ca","Canada"],["au","Australia"],["za","South Africa"],["eg","Egypt"],["ke","Kenya"]
+  ];
+  const N=FLAGS.length;
+  const lerp=(a,b,t)=>a*(1-t)+b*t, clamp=(v,a,b)=>Math.min(Math.max(v,a),b);
+  const wrap=document.getElementById('fcards');
+  const hero=document.getElementById('fhero');
+  const sticky=document.getElementById('fheroSticky');
+  const center=document.getElementById('fheroCenter');
+  const arc=document.getElementById('fheroArc');
+  if(!wrap||!hero||!sticky)return;
+  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const cards=[];
+  FLAGS.forEach(function(f,i){
+    const el=document.createElement('div');el.className='fcard';
+    el.innerHTML='<div class="finner">'+
+      '<div class="fface ffront"><img src="https://flagcdn.com/w160/'+f[0]+'.png" alt="'+f[1]+'" loading="eager"></div>'+
+      '<div class="fface fback"><div class="lab">Country</div><div class="nm">'+f[1]+'</div></div>'+
+    '</div>';
+    wrap.appendChild(el);
+    cards.push(el);
+    el._s={x:(Math.random()-.5)*1500,y:(Math.random()-.5)*1000,rot:(Math.random()-.5)*180,sc:.5,op:0};
+    el._scatter={x:el._s.x,y:el._s.y,rot:el._s.rot,sc:.6,op:0};
+  });
+
+  let phase=reduce?'circle':'scatter';
+  if(!reduce){
+    setTimeout(function(){phase='line';},450);
+    setTimeout(function(){phase='circle';},2200);
+  }
+
+  let mouseTX=0,mouseX=0;
+  sticky.addEventListener('mousemove',function(e){
+    const r=sticky.getBoundingClientRect();
+    mouseTX=(((e.clientX-r.left)/r.width)*2-1)*80;
+  });
+
+  let morph=0;
+
+  function targetFor(i,W,H){
+    if(phase==='scatter')return cards[i]._scatter;
+    if(phase==='line'){
+      const sp=70,tot=N*sp,x=i*sp-tot/2;
+      return {x:x,y:0,rot:0,sc:1,op:1};
+    }
+    const isMobile=W<768;
+    const minD=Math.min(W,H);
+    const cR=Math.min(minD*0.34,330);
+    const cA=(i/N)*360, cRad=cA*Math.PI/180;
+    const circle={x:Math.cos(cRad)*cR,y:Math.sin(cRad)*cR,rot:cA+90};
+    const baseR=Math.min(W,H*1.5);
+    const arcR=baseR*(isMobile?1.4:1.05);
+    const apexY=H*(isMobile?0.32:0.22);
+    const arcCenterY=apexY+arcR;
+    const spread=isMobile?104:132;
+    const startA=-90-spread/2, step=spread/(N-1);
+    const aAng=startA+i*step, aRad=aAng*Math.PI/180;
+    const arcP={x:Math.cos(aRad)*arcR+mouseX, y:Math.sin(aRad)*arcR+arcCenterY, rot:aAng+90, sc:isMobile?1.35:1.7};
+    return {
+      x:lerp(circle.x,arcP.x,morph),
+      y:lerp(circle.y,arcP.y,morph),
+      rot:lerp(circle.rot,arcP.rot,morph),
+      sc:lerp(1,arcP.sc,morph),
+      op:1
+    };
+  }
+
+  function frame(){
+    const W=sticky.clientWidth,H=sticky.clientHeight;
+    const rangeEnd=Math.max(hero.offsetHeight-H,1);
+    const p=clamp(window.scrollY/(rangeEnd*0.9),0,1);
+    morph+=(p-morph)*(reduce?1:0.12);
+    mouseX+=(mouseTX-mouseX)*0.07;
+
+    if(center){center.style.opacity=String(clamp(1-morph*1.7,0,1));center.style.filter='blur('+(morph*6).toFixed(2)+'px)';}
+    if(arc){const ac=clamp((morph-0.78)/0.22,0,1);arc.style.opacity=String(ac);arc.style.transform='translateX(-50%) translateY('+((1-ac)*18).toFixed(1)+'px)';}
+
+    for(let i=0;i<N;i++){
+      const t=targetFor(i,W,H);
+      const s=cards[i]._s;
+      const k=phase==='scatter'?0.12:0.09;
+      s.x+=(t.x-s.x)*k; s.y+=(t.y-s.y)*k;
+      s.rot+=(t.rot-s.rot)*k; s.sc+=(t.sc-s.sc)*k; s.op+=(t.op-s.op)*0.1;
+      const el=cards[i];
+      el.style.opacity=s.op.toFixed(3);
+      el.style.transform='translate(-50%,-50%) translate('+s.x.toFixed(2)+'px,'+s.y.toFixed(2)+'px) rotate('+s.rot.toFixed(2)+'deg) scale('+s.sc.toFixed(3)+')';
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>
